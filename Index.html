@@ -3,138 +3,186 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Portefeuille Virtuel</title>
+<title>Portefeuille Dépôt / Retrait / Transfert</title>
 <style>
-  body { font-family: Arial, sans-serif; background: #f5f5f5; margin:0; padding:0;}
-  .container { max-width: 800px; margin: 20px auto; padding:20px; background:white; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.1);}
-  h1 { text-align:center; color:#333; }
-  select, input { padding:8px; margin:5px 0; width:100%; }
-  button { padding:10px 20px; margin-top:10px; background:#007BFF; color:white; border:none; border-radius:5px; cursor:pointer; }
-  button:hover { background:#0056b3; }
-  .result { margin-top:20px; padding:10px; background:#e9e9e9; border-radius:5px; }
-  .note { font-size:0.85em; color:#555; margin-top:5px; }
-  #lastUpdate { font-size:0.9em; color:gray; transition: color 0.5s; }
+  body {
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+  }
+  .container {
+    max-width: 700px;
+    margin: auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  h2 {
+    text-align: center;
+    color: #333;
+  }
+  label {
+    display: block;
+    margin-top: 15px;
+    font-weight: bold;
+  }
+  select, input[type="number"] {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  .note {
+    background: #fff8c4;
+    border-left: 4px solid #ffcc00;
+    padding: 10px;
+    margin-top: 10px;
+    display: none;
+  }
+  button {
+    margin-top: 20px;
+    width: 100%;
+    padding: 10px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 7px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  button:hover {
+    background: #0056b3;
+  }
 </style>
 </head>
 <body>
 <div class="container">
-  <h1>Portefeuille Virtuel</h1>
+  <h2>Portefeuille Dépôt / Retrait / Transfert</h2>
 
-  <label for="operation">Choisir opération :</label>
+  <label for="operation">Opération:</label>
   <select id="operation">
-    <option value="deposit">Dépôt</option>
+    <option value="depot">Dépôt</option>
     <option value="retrait">Retrait</option>
     <option value="transfert">Transfert</option>
   </select>
 
-  <label for="fromMethod">De :</label>
-  <select id="fromMethod"></select>
+  <label for="source">Depuis:</label>
+  <select id="source"></select>
 
-  <label for="toMethod">Vers :</label>
-  <select id="toMethod"></select>
+  <label for="destination">Vers:</label>
+  <select id="destination"></select>
 
-  <label for="amount">Montant :</label>
+  <label for="amount">Montant:</label>
   <input type="number" id="amount" placeholder="Entrez le montant">
 
-  <button onclick="calculate()">Calculer</button>
+  <div class="note" id="wu-note">
+    ⚠️ Pour Western Union, vous devez vous rendre en agence pour effectuer le dépôt ou le retrait.
+  </div>
 
-  <div class="result" id="result"></div>
-  <div class="note" id="noteWU"></div>
-  <div id="lastUpdate"></div>
+  <button id="submitBtn">Valider</button>
 </div>
 
 <script>
-let cryptoList = {};
-let ewalletList = ['PayPal', 'Skrill', 'Perfect Money', 'Payoneer'];
-let mobileMoneyList = ['Airtel Money', 'Mvola', 'Orange Money'];
-let wuList = ['Western Union'];
+  // Hardcoded lists
+  const cryptoList = ["BTC", "ETH", "LTC", "BCH", "USDT"];
+  const ewalletList = ["PayPal", "Skrill", "Neteller", "Perfect Money"];
+  const mobileMoneyList = ["Mvola", "Airtel Money", "Orange Money"];
+  const wuList = ["Western Union"];
 
-function updateSelectOptions() {
-  const operation = document.getElementById('operation').value;
-  const fromSelect = document.getElementById('fromMethod');
-  const toSelect = document.getElementById('toMethod');
-  fromSelect.innerHTML = '';
-  toSelect.innerHTML = '';
+  const operationEl = document.getElementById("operation");
+  const sourceEl = document.getElementById("source");
+  const destinationEl = document.getElementById("destination");
+  const wuNoteEl = document.getElementById("wu-note");
 
-  let fromArr = [], toArr = [];
-  if(operation === 'deposit'){
-    fromArr = mobileMoneyList.concat(wuList);
-    toArr = Object.keys(cryptoList).concat(ewalletList);
-  } else if(operation === 'retrait'){
-    fromArr = Object.keys(cryptoList).concat(ewalletList);
-    toArr = mobileMoneyList.concat(wuList);
-  } else if(operation === 'transfert'){
-    fromArr = Object.keys(cryptoList).concat(ewalletList);
-    toArr = Object.keys(cryptoList).concat(ewalletList);
+  function populateDropdowns() {
+    const operation = operationEl.value;
+
+    // Clear previous options
+    sourceEl.innerHTML = "";
+    destinationEl.innerHTML = "";
+
+    if (operation === "depot") {
+      // Dépôt: depuis Mobile Money ou WU vers Crypto/E-wallet
+      mobileMoneyList.concat(wuList).forEach(item => {
+        const opt = document.createElement("option");
+        opt.value = item;
+        opt.textContent = item;
+        sourceEl.appendChild(opt);
+      });
+
+      cryptoList.concat(ewalletList).forEach(item => {
+        const opt = document.createElement("option");
+        opt.value = item;
+        opt.textContent = item;
+        destinationEl.appendChild(opt);
+      });
+
+    } else if (operation === "retrait") {
+      // Retrait: depuis Crypto/E-wallet vers Mobile Money/WU
+      cryptoList.concat(ewalletList).forEach(item => {
+        const opt = document.createElement("option");
+        opt.value = item;
+        opt.textContent = item;
+        sourceEl.appendChild(opt);
+      });
+
+      mobileMoneyList.concat(wuList).forEach(item => {
+        const opt = document.createElement("option");
+        opt.value = item;
+        opt.textContent = item;
+        destinationEl.appendChild(opt);
+      });
+
+    } else if (operation === "transfert") {
+      // Transfert: Crypto/E-wallet vers Crypto/E-wallet
+      cryptoList.concat(ewalletList).forEach(item => {
+        const optSource = document.createElement("option");
+        optSource.value = item;
+        optSource.textContent = item;
+        sourceEl.appendChild(optSource);
+
+        const optDest = document.createElement("option");
+        optDest.value = item;
+        optDest.textContent = item;
+        destinationEl.appendChild(optDest);
+      });
+    }
+
+    showWUInfo();
   }
 
-  fromArr.forEach(item=> fromSelect.add(new Option(item,item)));
-  toArr.forEach(item=> toSelect.add(new Option(item,item)));
-
-  // Note WU
-  const note = document.getElementById('noteWU');
-  note.innerText = '';
-  if(fromArr.includes('Western Union') || toArr.includes('Western Union')){
-    note.innerText = 'Note: Pour Western Union, l\'envoi ou retrait doit se faire via l\'agence locale.';
-  }
-}
-
-function updateTimestamp(){
-  const el = document.getElementById('lastUpdate');
-  const now = new Date();
-  el.innerText = 'Dernière mise à jour: ' + now.toLocaleTimeString();
-}
-
-function flashUpdate() {
-  const el = document.getElementById('lastUpdate');
-  el.style.color = 'green';
-  setTimeout(() => { el.style.color = 'gray'; }, 800);
-}
-
-async function fetchCryptoList() {
-  try {
-    const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=20&page=1&sparkline=false');
-    const data = await response.json();
-    cryptoList = {};
-    data.forEach(coin => { cryptoList[coin.symbol.toUpperCase()] = coin.current_price; });
-    updateSelectOptions();
-    updateTimestamp();
-    flashUpdate();
-  } catch(err){
-    console.error('Erreur fetch crypto:', err);
-  }
-}
-
-function calculate() {
-  const from = document.getElementById('fromMethod').value;
-  const to = document.getElementById('toMethod').value;
-  const amount = parseFloat(document.getElementById('amount').value);
-  if(isNaN(amount) || amount<=0){
-    alert('Veuillez entrer un montant valide');
-    return;
+  function showWUInfo() {
+    if (sourceEl.value === "Western Union" || destinationEl.value === "Western Union") {
+      wuNoteEl.style.display = "block";
+    } else {
+      wuNoteEl.style.display = "none";
+    }
   }
 
-  let result = 0;
-  if(cryptoList[from] && cryptoList[to]){
-    // Transfert crypto -> crypto
-    result = amount * (cryptoList[to]/cryptoList[from]);
-  } else if(cryptoList[from]){
-    // Crypto -> E-wallet (1:1 simplifié)
-    result = amount;
-  } else if(cryptoList[to]){
-    // E-wallet -> Crypto
-    result = amount;
-  } else {
-    result = amount;
-  }
+  // Event listeners
+  operationEl.addEventListener("change", populateDropdowns);
+  sourceEl.addEventListener("change", showWUInfo);
+  destinationEl.addEventListener("change", showWUInfo);
 
-  document.getElementById('result').innerText = `Montant reçu: ${result.toFixed(2)} ${to}`;
-}
+  document.getElementById("submitBtn").addEventListener("click", () => {
+    const op = operationEl.value;
+    const from = sourceEl.value;
+    const to = destinationEl.value;
+    const amount = document.getElementById("amount").value;
 
-document.getElementById('operation').addEventListener('change', updateSelectOptions);
+    if (!amount || amount <= 0) {
+      alert("Veuillez entrer un montant valide.");
+      return;
+    }
 
-fetchCryptoList();
-setInterval(fetchCryptoList, 60000); // refresh auto toutes les 60s
+    alert(`Opération: ${op}\nDepuis: ${from}\nVers: ${to}\nMontant: ${amount}`);
+  });
+
+  // Initial population
+  populateDropdowns();
 </script>
 </body>
 </html>
