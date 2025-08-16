@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>TakaloCash – Simple • Rapide • Sécurisé</title>
+<title>TakaloCash – Service</title>
 <style>
   :root{
     --brand:#ffbf00;        /* volamena */
@@ -45,6 +45,7 @@
   }
   .field input[readonly]{background:#f3f3f3;color:#333;cursor:not-allowed}
   .suffix{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:12px;font-weight:800;background:#111;color:#fff;border-radius:10px;padding:4px 8px}
+  .prefix{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:12px;font-weight:800;color:#555;padding:4px 8px}
   .grid{display:grid;grid-template-columns:1fr;gap:12px}
   @media(min-width:760px){.grid{grid-template-columns:1fr 1fr}}
   .note{font-size:12px;color:#333;margin-top:6px}
@@ -135,7 +136,7 @@
       </button>
       <button class="expand-btn" id="toggleMoreEwallets">
         <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        Plus d’e-wallets
+        Plus d'e-wallets
       </button>
     </div>
 
@@ -145,6 +146,7 @@
         <div class="label">Envoie</div>
         <div class="field">
           <input id="dep-amount-ariary" type="number" inputmode="decimal" placeholder="montant en ariary" />
+          <span class="prefix">MGA</span>
           <span class="suffix" id="dep-pay-logo">Mvola</span>
         </div>
 
@@ -153,14 +155,6 @@
           <button class="paybtn" data-pay="mvola" aria-pressed="true">Mvola</button>
           <button class="paybtn" data-pay="orange">Orange Money</button>
           <button class="paybtn" data-pay="airtel">Airtel Money</button>
-          <!-- eWallets quick -->
-          <button class="paybtn" data-pay="wise">Wise</button>
-          <button class="paybtn" data-pay="paypal">PayPal</button>
-          <button class="paybtn" data-pay="skrill">Skrill</button>
-          <button class="paybtn" data-pay="payoneer">Payoneer</button>
-          <!-- Crypto quick: BTC & USDT at least -->
-          <button class="paybtn" data-pay="BTC">BTC</button>
-          <button class="paybtn" data-pay="USDT">USDT</button>
         </div>
 
         <div class="note muted" id="dep-pay-hint">
@@ -192,11 +186,11 @@
     </div>
 
     <div class="label" style="margin-top:6px">Nom dans le compte</div>
-    <div class="field"><input id="dep-holder" type="text" placeholder="Nom dans le compte" /></div>
+    <div class="field"><input id="dep-holder" type="text" placeholder="Ex: Rakoto" /></div>
 
     <label class="checkbox">
       <input id="dep-accept" type="checkbox" />
-      <span class="muted">Je certifie avoir lu et pris connaissance des conditions générales d’utilisation du site internet et les accepter sans réserve.</span>
+      <span class="muted">Je certifie avoir lu et pris connaissance des conditions générales d'utilisation du site internet et les accepter sans réserve.</span>
     </label>
     <div class="actions">
       <button id="dep-preview" class="btn btn-primary" disabled>Aperçu</button>
@@ -213,7 +207,7 @@
       </button>
       <button class="expand-btn" id="toggleMoreEwallets2">
         <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        Plus d’e-wallets
+        Plus d'e-wallets
       </button>
     </div>
 
@@ -240,7 +234,8 @@
         <div class="label">Reçu</div>
         <div class="field">
           <input id="ret-amount-ariary" type="text" placeholder="0 MGA" readonly />
-          <span class="suffix">MGA</span>
+          <span class="prefix">MGA</span>
+          <span class="suffix" id="ret-wallet-logo">Mvola</span>
         </div>
         <div class="note muted">
           <div id="ret-rate-note">1 BTC = … MGA</div>
@@ -248,30 +243,20 @@
         </div>
 
         <div class="label">Moyen de réception</div>
-        <div class="row">
-          <div class="field">
-            <input id="ret-phone" type="tel" placeholder="Numéro (mobile money / e-wallet)" />
-          </div>
-          <select id="ret-wallet" title="Wallet" style="padding:12px;border-radius:12px;border:1px solid #ddd;background:#fff">
-            <option value="mvola">Mvola</option>
-            <option value="orange">Orange Money</option>
-            <option value="airtel">Airtel Money</option>
-            <option value="wise">Wise</option>
-            <option value="paypal">PayPal</option>
-            <option value="skrill">Skrill</option>
-            <option value="payoneer">Payoneer</option>
-          </select>
+        <div class="field">
+          <input id="ret-phone" type="tel" placeholder="Numéro (mobile money / e-wallet)" />
+          <span class="suffix" id="ret-wallet-icon">Mvola</span>
         </div>
         <div class="note muted" id="ret-wallet-note">Nom dans le compte Mvola</div>
 
         <div class="label">Nom du titulaire</div>
-        <div class="field"><input id="ret-name" type="text" placeholder="Nom dans le compte" /></div>
+        <div class="field"><input id="ret-name" type="text" placeholder="Ex: Rakoto" /></div>
       </div>
     </div>
 
     <label class="checkbox">
       <input id="ret-accept" type="checkbox" />
-      <span class="muted">Je certifie avoir lu et pris connaissance des conditions générales d’utilisation du site internet et les accepter sans réserve.</span>
+      <span class="muted">Je certifie avoir lu et pris connaissance des conditions générales d'utilisation du site internet et les accepter sans réserve.</span>
     </label>
     <div class="actions">
       <button id="ret-preview" class="btn btn-primary" disabled>Aperçu</button>
@@ -288,7 +273,7 @@
       </button>
       <button class="expand-btn" id="toggleMoreEwallets3">
         <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        Plus d’e-wallets
+        Plus d'e-wallets
       </button>
     </div>
 
@@ -316,9 +301,14 @@
     <div class="crypto-strip" id="cryptoStripTransfer"></div>
     <div class="ewallet-strip" id="ewalletStripTransfer"></div>
 
+    <div class="label" style="margin-top:8px">Adresse de réception</div>
+    <div class="field">
+      <input id="trf-dest-addr" type="text" placeholder="Adresse de votre wallet" />
+    </div>
+
     <label class="checkbox">
       <input id="trf-accept" type="checkbox" />
-      <span class="muted">Je certifie avoir lu et pris connaissance des conditions générales d’utilisation du site internet et les accepter sans réserve.</span>
+      <span class="muted">Je certifie avoir lu et pris connaissance des conditions générales d'utilisation du site internet et les accepter sans réserve.</span>
     </label>
     <div class="actions">
       <button id="trf-preview" class="btn btn-primary" disabled>Aperçu</button>
@@ -354,7 +344,7 @@
     </div>
 
     <div class="legal">
-      <a data-modal="cgu">Conditions générales d’utilisation</a>
+      <a data-modal="cgu">Conditions générales d'utilisation</a>
       <a data-modal="mentions">Mentions légales</a>
       <a data-modal="privacy">Politique de confidentialité</a>
     </div>
@@ -364,7 +354,7 @@
 </footer>
 
 <!-- LEGAL MODALS -->
-<dialog id="dlg-cgu"><h3>Conditions générales</h3><p>Exemple de conditions… (soloina amin’ny tena pejy-nao).</p><div style="text-align:right;margin-top:10px"><button onclick="this.closest('dialog').close()">OK</button></div></dialog>
+<dialog id="dlg-cgu"><h3>Conditions générales</h3><p>Exemple de conditions… (soloina amin'ny tena pejy-nao).</p><div style="text-align:right;margin-top:10px"><button onclick="this.closest('dialog').close()">OK</button></div></dialog>
 <dialog id="dlg-mentions"><h3>Mentions légales</h3><p>Exemple de mentions…</p><div style="text-align:right;margin-top:10px"><button onclick="this.closest('dialog').close()">OK</button></div></dialog>
 <dialog id="dlg-privacy"><h3>Politique de confidentialité</h3><p>Exemple de politique…</p><div style="text-align:right;margin-top:10px"><button onclick="this.closest('dialog').close()">OK</button></div></dialog>
 
@@ -387,15 +377,15 @@ const CONFIG = {
   whatsapp  : "https://wa.me/261347451051",
   // ---- Our receiving addresses / IDs ----
   wallets: {
-    // Mobile money numbers (used as “destination” rehefa voafidy izy)
-    mvola : {label:"Mvola",  num:"0347451051", name:"Julio Landry"},
-    orange: {label:"Orange Money", num:"0324923117", name:"Julio Landry"},
-    airtel: {label:"Airtel Money", num:"0331483290", name:"Julio RANDRIANARIMANANA"},
+    // Mobile money numbers (used as "destination" rehefa voafidy izy)
+    mvola : {label:"Mvola",  num:"0347451051", name:"Julio Landry", logo:"Mvola"},
+    orange: {label:"Orange Money", num:"0324923117", name:"Julio Landry", logo:"Orange"},
+    airtel: {label:"Airtel Money", num:"0331483290", name:"Julio RANDRIANARIMANANA", logo:"Airtel"},
     // eWallets
-    wise:   {label:"Wise",   addr:"WISE-ACCOUNT-ID-EXEMPLE",    name:"TakaloCash"},
-    paypal: {label:"PayPal", addr:"paypal@takalocash.mg",       name:"TakaloCash"},
-    skrill: {label:"Skrill", addr:"skrill@takalocash.mg",       name:"TakaloCash"},
-    payoneer:{label:"Payoneer", addr:"PAYONEER-ID-EXEMPLE",     name:"TakaloCash"}
+    wise:   {label:"Wise",   addr:"WISE-ACCOUNT-ID-EXEMPLE",    name:"TakaloCash", logo:"$"},
+    paypal: {label:"PayPal", addr:"paypal@takalocash.mg",       name:"TakaloCash", logo:"$"},
+    skrill: {label:"Skrill", addr:"skrill@takalocash.mg",       name:"TakaloCash", logo:"€"},
+    payoneer:{label:"Payoneer", addr:"PAYONEER-ID-EXEMPLE",     name:"TakaloCash", logo:"$"}
   },
   cryptoAddrs: {
     BTC:"bc1-EXEMPLE-BTC-ADDRESS",
@@ -527,10 +517,12 @@ $("#ret-copy").addEventListener("click",()=>{ $("#ret-our-addr").select(); docum
 /* ===== Inputs & selects ===== */
 $("#dep-amount-ariary").addEventListener("input", refreshDepot);
 $("#ret-amount-crypto").addEventListener("input", refreshRetrait);
-$("#ret-wallet").addEventListener("change", ()=>{
-  const w=$("#ret-wallet").value;
-  const labels={mvola:"Mvola",orange:"Orange Money",airtel:"Airtel Money",wise:"Wise",paypal:"PayPal",skrill:"Skrill",payoneer:"Payoneer"};
-  $("#ret-wallet-note").textContent = "Nom dans le compte " + (labels[w]||"");
+$("#ret-phone").addEventListener("input", function(){
+  const num = this.value.trim();
+  let wallet = "mvola";
+  if(num.startsWith("032") || num.startsWith("037")) wallet = "orange";
+  else if(num.startsWith("033")) wallet = "orange";
+  $("#ret-wallet-icon").textContent = CONFIG.wallets[wallet]?.logo || "";
 });
 $("#trf-amount-top").addEventListener("input", refreshTransfer);
 
@@ -567,7 +559,7 @@ function updateDepotDest(){
     const w=CONFIG.wallets[payChoice];
     $("#dep-pay-dest").textContent = w.num;
     $("#dep-pay-name").textContent = w.name;
-    $("#dep-pay-logo").textContent = w.label;
+    $("#dep-pay-logo").textContent = w.logo;
     // address field becomes their number/ID for clarity but read-only
     $("#dep-addr").value = w.num;
     $("#dep-addr-label").textContent = "Numéro de paiement";
@@ -576,7 +568,7 @@ function updateDepotDest(){
     const w=CONFIG.wallets[payChoice];
     $("#dep-pay-dest").textContent = w.addr || w.num || "";
     $("#dep-pay-name").textContent = w.name || "TakaloCash";
-    $("#dep-pay-logo").textContent = w.label;
+    $("#dep-pay-logo").textContent = w.logo;
     $("#dep-addr").value = w.addr || "";
     $("#dep-addr-label").textContent = "Adresse de paiement";
     $("#dep-addr-note").textContent = "Adresse/identifiant présaisie selon le moyen sélectionné (non modifiable).";
@@ -664,8 +656,9 @@ function requiredFilledRetrait(){
 }
 function requiredFilledTransfert(){
   const q = $("#trf-amount-top").value.trim()!=="" && Number($("#trf-amount-top").value)>0;
+  const addr = $("#trf-dest-addr").value.trim()!=="";
   const chk = $("#trf-accept").checked;
-  return q && chk;
+  return q && addr && chk;
 }
 function guardOrWarn(ok){ if(!ok){ toast("Fenoy avokoa ny saha rehetra ary cocheo ny fepetra."); } return ok; }
 
@@ -714,6 +707,7 @@ $("#trf-preview").addEventListener("click", async ()=>{
     montant_source: $("#trf-amount-top").value,
     target: transferTarget,
     montant_cible: $("#trf-amount-bot").value,
+    adresse_dest: $("#trf-dest-addr").value,
     taux: `1 ${currentCrypto} = ${crossRate(currentCrypto, /^[A-Z]{3,5}$/.test(transferTarget)?transferTarget:"USDT")} ${/^[A-Z]{3,5}$/.test(transferTarget)?transferTarget:"USDT"}`,
     frais: (CONFIG.fees.transfert*100).toFixed(1)+"%"
   };
@@ -733,7 +727,7 @@ async function sendEmail(data){
     }
   }catch(e){
     console.error(e);
-    toast("Erreur lors de l’envoi. Hamarino ny connexion na ny configuration EmailJS.", 3500);
+    toast("Erreur lors de l'envoi. Hamarino ny connexion na ny configuration EmailJS.", 3500);
   }
 }
 
@@ -741,4 +735,4 @@ async function sendEmail(data){
 updateDepotDest();
 </script>
 </body>
-</html> 
+</html>
