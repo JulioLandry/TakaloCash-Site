@@ -1,193 +1,591 @@
-<!DOCTYPE html>
-<html lang="mg">
+<!doctype html>
+<html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TakaloCash Services</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      background: #f8f8f8;
-    }
-    header {
-      background: #222;
-      color: white;
-      text-align: center;
-      padding: 20px;
-    }
-    header h1 {
-      margin: 0;
-      font-size: 2em;
-    }
-    header p {
-      margin: 5px 0 0;
-      font-style: italic;
-    }
-    nav {
-      text-align: right;
-      padding: 10px;
-      background: #eee;
-    }
-    nav select {
-      padding: 5px;
-    }
-    main {
-      max-width: 800px;
-      margin: auto;
-      padding: 20px;
-    }
-    section {
-      background: white;
-      margin-bottom: 20px;
-      padding: 15px;
-      border-radius: 8px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
-    }
-    section h2 {
-      margin-top: 0;
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-    }
-    input, select, button {
-      padding: 8px;
-      margin-top: 5px;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    button {
-      background: #28a745;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    button:disabled {
-      background: #aaa;
-      cursor: not-allowed;
-    }
-    footer {
-      text-align: center;
-      padding: 15px;
-      font-size: 0.9em;
-      background: #222;
-      color: white;
-    }
-    .contact-buttons img {
-      width: 32px;
-      margin: 0 5px;
-      cursor: pointer;
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TakaloCash – Simple • Rapide • Sécurisé</title>
+<style>
+  :root{
+    --brand:#ffbf00;        /* volamena */
+    --brand-2:#d9a300;      /* volamena maizina kely */
+    --dark:#0c0c0c;
+    --grey:#f3f3f3;
+    --ink:#222;
+    --muted:#7a7a7a;
+    --ok:#16a34a;
+    --danger:#dc2626;
+    --pill-radius:999px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans";
+    color:#111;background:white;line-height:1.35;
+  }
+  /* ===== Header ===== */
+  header{
+    background: var(--dark);
+    color:#fff;
+    padding:24px 16px 8px;
+    position:sticky;top:0;z-index:10;
+    box-shadow:0 6px 24px rgba(0,0,0,.2);
+  }
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    max-width:980px;margin:0 auto;
+  }
+  .brand{display:flex;flex-direction:column}
+  .brand .title{
+    font-weight:1000;letter-spacing:.5px;font-size:30px;color:var(--brand)
+  }
+  .brand .subtitle{
+    margin-top:6px;display:inline-block;padding:6px 12px;background:#eee;color:#111;
+    border-radius:8px;font-weight:800;letter-spacing:3px;text-transform:lowercase
+  }
+  .flags{display:flex;gap:8px}
+  .flag{
+    width:28px;height:18px;border-radius:3px;overflow:hidden;cursor:pointer;border:1px solid #0003;background:#fff;
+  }
+  .lang-active{outline:2px solid var(--brand)}
+  .tabs{
+    display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;
+    max-width:980px;margin-left:auto;margin-right:auto;padding:0 4px 10px;
+  }
+  .tab{
+    background:var(--brand);border:none;color:#111;font-weight:900;
+    padding:10px 18px;border-radius:var(--pill-radius);cursor:pointer;
+    letter-spacing:.5px;font-size:15px;
+    box-shadow:0 3px 0 var(--brand-2)
+  }
+  .tab[aria-selected="true"]{background:#111;color:#fff;box-shadow:0 3px 0 #000}
+  main{max-width:980px;margin:18px auto;padding:0 12px 80px}
+  /* ===== common UI ===== */
+  .crypto-strip{
+    display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0 16px
+  }
+  .chip{
+    padding:6px 10px;border-radius:14px;background:#111;color:#fff;font-weight:700;
+    font-size:12px;cursor:pointer;border:1px solid #000;user-select:none
+  }
+  .chip[aria-pressed="true"]{background:var(--brand);color:#111;border-color:#d6a800}
+  .panel{
+    background:#fff;border:1px solid #eee;border-radius:16px;padding:14px 14px 18px;
+    box-shadow:0 10px 30px rgba(0,0,0,.06);margin-bottom:14px
+  }
+  .row{display:flex;gap:10px;align-items:center}
+  .field{flex:1;position:relative}
+  .field input, .field select, .field textarea{
+    width:100%;padding:14px 14px 14px 14px;border-radius:12px;border:1px solid #ddd;background:#f9f9f9;
+    font-size:16px;outline:none
+  }
+  .field textarea{min-height:80px;resize:vertical}
+  .label{font-size:13px;color:#444;margin-bottom:6px;font-weight:800;letter-spacing:.2px}
+  .suffix{
+    position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:12px;font-weight:800;
+    background:#111;color:#fff;border-radius:10px;padding:4px 8px
+  }
+  .note{font-size:12px;color:#333;margin-top:6px}
+  .muted{color:var(--muted)}
+  .grid{display:grid;grid-template-columns:1fr;gap:12px}
+  @media(min-width:760px){.grid{grid-template-columns:1fr 1fr}}
+  .pay-opts{display:flex;gap:8px;flex-wrap:wrap}
+  .paybtn{
+    border:1px solid #ddd;background:#fff;border-radius:12px;padding:8px 10px;cursor:pointer;font-weight:800
+  }
+  .paybtn[aria-pressed="true"]{background:#111;color:#fff;border-color:#000}
+  .checkbox{display:flex;gap:8px;align-items:flex-start;margin-top:6px}
+  .actions{display:flex;gap:10px;align-items:center;margin-top:10px}
+  .btn{border:none;border-radius:16px;padding:12px 16px;font-weight:900;cursor:pointer}
+  .btn-primary{background:var(--brand);color:#111}
+  .btn-primary:disabled{opacity:.5;cursor:not-allowed}
+  .btn-ghost{background:#000;color:#fff}
+  /* ===== footer ===== */
+  footer{background:#111;color:#fff;padding:24px 12px 40px}
+  .footer-wrap{max-width:980px;margin:0 auto}
+  .cta{display:flex;gap:10px;flex-wrap:wrap}
+  .ctabtn{border:none;border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:900}
+  .ctabtn[data-kind="email"]{background:#fff}
+  .ctabtn[data-kind="call"]{background:#fff}
+  .ctabtn[data-kind="fb"]{background:#1877f2;color:#fff}
+  .legal{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px}
+  .legal a{color:#9ad3ff;text-decoration:underline;cursor:pointer}
+  dialog{border:none;border-radius:16px;padding:18px;max-width:720px;width:92%}
+  dialog::backdrop{background:rgba(0,0,0,.5)}
+  .copy{font-size:12px;color:#ddd;margin-top:12px}
+  .pill-hl{display:inline-block;background:var(--brand);color:#111;font-weight:900;padding:4px 10px;border-radius:999px}
+</style>
 </head>
 <body>
 
 <header>
-  <h1>TakaloCash Services</h1>
-  <p>Simple - Rapide - Sécurisé</p>
+  <div class="topbar">
+    <div class="brand">
+      <div class="title">TAKALOCASH</div>
+      <div class="subtitle" id="slogan" data-i18n="slogan">Simple – rapide – sécurisé</div>
+    </div>
+    <div class="flags" aria-label="Language">
+      <!-- FR -->
+      <button class="flag lang-active" id="lang-fr" aria-pressed="true" title="Français">
+        <svg viewBox="0 0 3 2" width="28" height="18">
+          <rect width="1" height="2" x="0" y="0" fill="#0055a4"/>
+          <rect width="1" height="2" x="1" y="0" fill="#fff"/>
+          <rect width="1" height="2" x="2" y="0" fill="#ef4135"/>
+        </svg>
+      </button>
+      <!-- MG -->
+      <button class="flag" id="lang-mg" aria-pressed="false" title="Malagasy">
+        <svg viewBox="0 0 3 2" width="28" height="18">
+          <rect width="1" height="2" x="0" y="0" fill="#ffffff"/>
+          <rect width="2" height="1" x="1" y="0" fill="#fc3d32"/>
+          <rect width="2" height="1" x="1" y="1" fill="#007e3a"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="tabs" role="tablist" aria-label="Service">
+    <button class="tab" role="tab" id="tab-depot" aria-selected="true" data-tab="depot" data-i18n="depot">DÉPÔT</button>
+    <button class="tab" role="tab" id="tab-retrait" aria-selected="false" data-tab="retrait" data-i18n="retrait">RETRAIT</button>
+    <button class="tab" role="tab" id="tab-transfert" aria-selected="false" data-tab="transfert" data-i18n="transfert">TRANSFERT</button>
+  </div>
 </header>
 
-<nav>
-  <label for="lang-select">Langue: </label>
-  <select id="lang-select">
-    <option value="fr">Français</option>
-    <option value="mg">Malagasy</option>
-  </select>
-</nav>
-
 <main>
-  <!-- DEPOT -->
-  <section id="depot">
-    <h2>Dépôt</h2>
-    <label>Montant en Ariary:</label>
-    <input type="number" id="montant-ariary" placeholder="Montant en Ariary">
+  <!-- Crypto strip -->
+  <div class="crypto-strip" id="cryptoStrip" aria-label="Cryptos"></div>
 
-    <label>Méthode de paiement:</label>
-    <select id="methode">
-      <option value="mvola">MVola</option>
-      <option value="orange">Orange Money</option>
-      <option value="airtel">Airtel Money</option>
-    </select>
+  <!-- ================== DEPOT ================== -->
+  <section id="panel-depot" class="panel" role="tabpanel" aria-labelledby="tab-depot">
+    <div class="grid">
+      <div>
+        <div class="label" data-i18n="envoyer">Envoie</div>
+        <div class="field">
+          <input id="dep-amount-ariary" type="number" inputmode="decimal" placeholder="montant en ariary" />
+          <span class="suffix" id="dep-pay-logo">Mvola</span>
+        </div>
+        <div class="note">
+          <div class="pay-opts" id="dep-pay-opts">
+            <button class="paybtn" data-pay="mvola" aria-pressed="true">Mvola</button>
+            <button class="paybtn" data-pay="orange">Orange Money</button>
+            <button class="paybtn" data-pay="airtel">Airtel Money</button>
+            <button class="paybtn" data-pay="skrill">Skrill</button>
+            <button class="paybtn" data-pay="wise">Wise</button>
+            <button class="paybtn" data-pay="paypal">PayPal</button>
+          </div>
+          <div class="muted" id="dep-pay-hint">Envoyer à <span class="pill-hl" id="dep-pay-num">0347451051</span> — Nom: <b id="dep-pay-name">Julio Landry</b></div>
+        </div>
+      </div>
 
-    <p id="coordonnees"></p>
+      <div>
+        <div class="label">Reçu</div>
+        <div class="field">
+          <input id="dep-amount-crypto" type="text" placeholder="0.00000000" readonly />
+          <span class="suffix" id="dep-crypto-suffix">BTC</span>
+        </div>
+        <div class="note muted">
+          <div id="dep-rate-note">1 BTC = … MGA</div>
+          <div id="dep-fee-note">Frais: 0,3%</div>
+        </div>
+        <div class="label" id="dep-addr-label">Adresse bitcoin</div>
+        <div class="row">
+          <div class="field">
+            <input id="dep-addr" type="text" placeholder="Adresse de réception (ex: bc1... / 0x... / TRC20...)" />
+          </div>
+        </div>
+      </div>
+    </div>
 
-    <label>Crypto:</label>
-    <select id="crypto">
-      <option value="btc">Bitcoin</option>
-      <option value="usdt">USDT</option>
-    </select>
-
-    <p id="conversion"></p>
-
-    <label>
-      <input type="checkbox" id="coche"> J'accepte les conditions
+    <label class="checkbox">
+      <input id="dep-accept" type="checkbox" />
+      <span class="muted" data-i18n="accept">Je certifie avoir lu et pris connaissance des conditions générales d’utilisation du site internet et les accepter sans réserve.</span>
     </label>
-
-    <button id="apercu" disabled>Aperçu</button>
+    <div class="actions">
+      <button id="dep-preview" class="btn btn-primary" disabled data-i18n="apercu">Aperçu</button>
+      <span class="muted" id="dep-msg"></span>
+    </div>
   </section>
 
-  <!-- RETRAIT -->
-  <section id="retrait">
-    <h2>Retrait</h2>
-    <label>Montant en Crypto:</label>
-    <input type="number" id="montant-crypto" placeholder="Montant en crypto">
-    <label>Adresse de réception:</label>
-    <input type="text" id="adresse-retrait" placeholder="Votre adresse">
-    <label>
-      <input type="checkbox" id="coche-retrait"> J'accepte les conditions
+  <!-- ================== RETRAIT ================== -->
+  <section id="panel-retrait" class="panel" role="tabpanel" aria-labelledby="tab-retrait" hidden>
+    <div class="grid">
+      <div>
+        <div class="label" data-i18n="envoyer">Envoie</div>
+        <div class="field">
+          <input id="ret-amount-crypto" type="number" inputmode="decimal" placeholder="0.00000000" />
+          <span class="suffix" id="ret-crypto-suffix">BTC</span>
+        </div>
+        <div class="note">
+          <div class="row">
+            <div class="field">
+              <div class="label" data-i18n="adresse_nou">Adresse (nô)</div>
+              <input id="ret-our-addr" type="text" />
+            </div>
+            <button id="ret-copy" class="btn btn-ghost">Copier</button>
+          </div>
+          <div class="muted" id="ret-crypto-only">Envoyer seulement en <b>BTC</b></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="label">Reçu</div>
+        <div class="field">
+          <input id="ret-amount-ariary" type="text" placeholder="0 MGA" readonly />
+          <span class="suffix">MGA</span>
+        </div>
+        <div class="note muted">
+          <div id="ret-rate-note">1 BTC = … MGA</div>
+          <div id="ret-fee-note">Frais: 0,5%</div>
+        </div>
+
+        <div class="label">Numéro (réception)</div>
+        <div class="row">
+          <div class="field">
+            <input id="ret-phone" type="tel" placeholder="Numéro de mobile money / e-wallet" />
+          </div>
+          <select id="ret-wallet" title="Wallet" style="padding:12px;border-radius:12px;border:1px solid #ddd;background:#fff">
+            <option value="mvola">Mvola</option>
+            <option value="orange">Orange Money</option>
+            <option value="airtel">Airtel Money</option>
+            <option value="skrill">Skrill</option>
+            <option value="wise">Wise</option>
+            <option value="paypal">PayPal</option>
+          </select>
+        </div>
+        <div class="note muted" id="ret-wallet-note">Nom dans le compte Mvola</div>
+
+        <div class="label">Nom du titulaire</div>
+        <div class="field"><input id="ret-name" type="text" placeholder="Anarana ao amin'ny kaonty" /></div>
+      </div>
+    </div>
+
+    <label class="checkbox">
+      <input id="ret-accept" type="checkbox" />
+      <span class="muted" data-i18n="accept">Je certifie avoir lu et pris connaissance des conditions générales d’utilisation du site internet et les accepter sans réserve.</span>
     </label>
-    <button id="apercu-retrait" disabled>Aperçu</button>
+    <div class="actions">
+      <button id="ret-preview" class="btn btn-primary" disabled data-i18n="apercu">Aperçu</button>
+      <span class="muted" id="ret-msg"></span>
+    </div>
   </section>
 
+  <!-- ================== TRANSFERT ================== -->
+  <section id="panel-transfert" class="panel" role="tabpanel" aria-labelledby="tab-transfert" hidden>
+    <div class="grid">
+      <div>
+        <div class="label" data-i18n="envoyer">Envoie</div>
+        <div class="field">
+          <input id="trf-amount-top" type="number" inputmode="decimal" placeholder="0.00000000" />
+          <span class="suffix" id="trf-top-suffix">BTC</span>
+        </div>
+        <div class="note muted" id="trf-top-note">Crypto source: BTC</div>
+      </div>
+
+      <div>
+        <div class="label">Reçu</div>
+        <div class="field">
+          <input id="trf-amount-bot" type="text" placeholder="0.00000000" readonly />
+          <span class="suffix" id="trf-bot-suffix">USDT</span>
+        </div>
+        <div class="note muted" id="trf-rate-note">1 BTC = 35 USDT</div>
+      </div>
+    </div>
+
+    <div class="label" style="margin-top:8px">Choisir la crypto à recevoir</div>
+    <div class="crypto-strip" id="cryptoStripTransfer"></div>
+
+    <label class="checkbox">
+      <input id="trf-accept" type="checkbox" />
+      <span class="muted" data-i18n="accept">Je certifie avoir lu et pris connaissance des conditions générales d’utilisation du site internet et les accepter sans réserve.</span>
+    </label>
+    <div class="actions">
+      <button id="trf-preview" class="btn btn-primary" disabled data-i18n="apercu">Aperçu</button>
+      <span class="muted" id="trf-msg"></span>
+    </div>
+  </section>
 </main>
 
 <footer>
-  <div class="contact-buttons">
-    <img src="email-icon.png" alt="Email">
-    <img src="phone-icon.png" alt="Appel">
-    <img src="facebook-icon.png" alt="Facebook">
+  <div class="footer-wrap">
+    <div class="cta">
+      <button class="ctabtn" data-kind="email" id="cta-email">Email</button>
+      <button class="ctabtn" data-kind="call" id="cta-call">Appeler</button>
+      <button class="ctabtn" data-kind="fb" id="cta-fb">facebook</button>
+    </div>
+
+    <div class="legal">
+      <a data-modal="cgu">Conditions générales d’utilisation</a>
+      <a data-modal="mentions">Mentions légales</a>
+      <a data-modal="privacy">Politique de confidentialité</a>
+    </div>
+
+    <div class="copy">© 2025 TakaloCash. Tous droits réservés. <br><span class="muted">"La confiance est la clé de la collaboration."</span></div>
   </div>
-  <p>Conditions | Règles | Politique</p>
 </footer>
 
+<!-- Modals -->
+<dialog id="dlg-cgu"><h3>Conditions générales</h3><p>Exemple de conditions… (soloina amin’ny tena pejy-nao).</p><div style="text-align:right;margin-top:10px"><button onclick="this.closest('dialog').close()">OK</button></div></dialog>
+<dialog id="dlg-mentions"><h3>Mentions légales</h3><p>Exemple de mentions…</p><div style="text-align:right;margin-top:10px"><button onclick="this.closest('dialog').close()">OK</button></div></dialog>
+<dialog id="dlg-privacy"><h3>Politique de confidentialité</h3><p>Exemple de politique…</p><div style="text-align:right;margin-top:10px"><button onclick="this.closest('dialog').close()">OK</button></div></dialog>
+
 <script>
-  // Gestion coordonnées dépôt
-  const methodeSelect = document.getElementById('methode');
-  const coordonneesP = document.getElementById('coordonnees');
-  methodeSelect.addEventListener('change', () => {
-    if(methodeSelect.value === 'mvola'){
-      coordonneesP.textContent = "034xxxxxxx - Julio Landry";
-    } else if(methodeSelect.value === 'orange'){
-      coordonneesP.textContent = "0324923117 - Julio Landry";
-    } else if(methodeSelect.value === 'airtel'){
-      coordonneesP.textContent = "0331483290 - Julio RANDRIANARIMANANA";
-    }
-  });
+/* ================== CONFIG ================== */
+const CONFIG = {
+  emailTo: "contact@takalocash.mg",   // mail handefasana “Aperçu”
+  phoneCall: "+261347451051",         // ho an’ny bouton Appeler
+  facebookUrl: "https://facebook.com/",// asiana lien
+  ourAddresses: {                      // adiresy fandraisanareo (RETrait)
+    BTC: "bc1-EXEMPLE-BTC-ADRESSE",
+    ETH: "0xEXEMPLEETH",
+    USDT: "TEXEMPLEUSDT",
+    LTC: "ltc1qEXEMPLE",
+    BCH: "qzEXEMPLE",
+    USDC: "",
+    BUSD: "",
+    DAI: "",
+    ADA: "",
+    SOL: "",
+    DOT: "",
+    LINK: "",
+    UNI: "",
+    CAKE: ""
+  },
+  // Crypto list & initial rates (ohatra fotsiny; ovao araka ny tena taux)
+  cryptos: ["BTC","ETH","LTC","BCH","USDT","USDC","BUSD","DAI","ADA","SOL","DOT","LINK","UNI","CAKE"],
+  ratesMGA: {      // 1 unit crypto = MGA (ohatra)
+    BTC: 150_000_000,   // 1 BTC = 150,000,000 MGA (exemple)
+    ETH: 9_000_000,
+    LTC: 350_000,
+    BCH: 2_800_000,
+    USDT: 4_500,
+    USDC: 4_500,
+    BUSD: 4_500,
+    DAI: 4_500,
+    ADA: 1_200,
+    SOL: 700_000,
+    DOT: 120_000,
+    LINK: 80_000,
+    UNI: 60_000,
+    CAKE: 30_000
+  },
+  // Frais (exemple)
+  fees: {
+    depot: 0.003,    // 0.3%
+    retrait: 0.005,  // 0.5%
+    transfert: 0.004 // 0.4% ohatra
+  },
+  // Pay options (including e-wallets)
+  payMap: {
+    mvola:  {label:"Mvola",  num:"0347451051", name:"Julio Landry"},
+    orange: {label:"Orange Money", num:"0324923117", name:"Julio Landry"},
+    airtel: {label:"Airtel Money", num:"0331483290", name:"Julio RANDRIANARIMANANA"},
+    skrill: {label:"Skrill", num:"your-skrill-id@email", name:"TakaloCash"},
+    wise:   {label:"Wise",   num:"wise-username-or-IBAN", name:"TakaloCash"},
+    paypal: {label:"PayPal", num:"paypal@takalocash.mg", name:"TakaloCash"}
+  }
+};
+// i18n simple
+const I18N = {
+  fr: {
+    slogan: "Simple – rapide – sécurisé",
+    depot: "DÉPÔT", retrait: "RETRAIT", transfert:"TRANSFERT",
+    envoyer:"Envoie", accept:"Je certifie avoir lu et pris connaissance des conditions générales d’utilisation du site internet et les accepter sans réserve.",
+    apercu:"Aperçu", adresse_nou:"Adresse (nô)"
+  },
+  mg: {
+    slogan: "Tsotra – haingana – azo antoka",
+    depot: "DÉPÔT", retrait: "RETRAIT", transfert:"TRANSFERT",
+    envoyer:"Fandefasana", accept:"Manamarina aho fa namaky sy manaiky tsy misy fepetra ny fepetra fampiasana ny tranonkala.",
+    apercu:"Aperçu", adresse_nou:"Adiresy (anay)"
+  }
+};
+/* =============== STATE =============== */
+let currentLang = "fr";
+let currentCrypto = "BTC";
+let transferTarget = "USDT";
+let payChoice = "mvola";
 
-  // Checkbox activation bouton
-  const coche = document.getElementById('coche');
-  const apercuBtn = document.getElementById('apercu');
-  coche.addEventListener('change', () => {
-    apercuBtn.disabled = !coche.checked;
-  });
+/* ======= DOM helpers ======= */
+const $ = s=>document.querySelector(s);
+const $$ = s=>document.querySelectorAll(s);
 
-  const cocheRetrait = document.getElementById('coche-retrait');
-  const apercuRetraitBtn = document.getElementById('apercu-retrait');
-  cocheRetrait.addEventListener('change', () => {
-    apercuRetraitBtn.disabled = !cocheRetrait.checked;
+/* ===== Build crypto chips ===== */
+function buildChips(){
+  const strip = $("#cryptoStrip");
+  strip.innerHTML="";
+  CONFIG.cryptos.forEach(sym=>{
+    const b=document.createElement("button");
+    b.className="chip"; b.textContent=sym; b.dataset.sym=sym;
+    b.setAttribute("aria-pressed", sym===currentCrypto ? "true":"false");
+    b.addEventListener("click", ()=>{ currentCrypto=sym; refreshAll(); });
+    strip.appendChild(b);
   });
+  // transfer target chips
+  const tstrip=$("#cryptoStripTransfer");
+  if(tstrip){
+    tstrip.innerHTML="";
+    CONFIG.cryptos.forEach(sym=>{
+      const b=document.createElement("button");
+      b.className="chip"; b.textContent=sym; b.dataset.sym=sym;
+      b.setAttribute("aria-pressed", sym===transferTarget ? "true":"false");
+      b.addEventListener("click", ()=>{ transferTarget=sym; refreshTransfer(); });
+      tstrip.appendChild(b);
+    });
+  }
+}
+buildChips();
 
-  // Conversion automatique Ariary -> Crypto (exemple)
-  const montantAriaryInput = document.getElementById('montant-ariary');
-  const cryptoSelect = document.getElementById('crypto');
-  const conversionP = document.getElementById('conversion');
-  montantAriaryInput.addEventListener('input', () => {
-    let taux = (cryptoSelect.value === 'btc') ? 123000 : 4500; // exemple
-    let montantCrypto = montantAriaryInput.value / taux;
-    conversionP.textContent = `Équivaut à: ${montantCrypto.toFixed(6)} ${cryptoSelect.value.toUpperCase()} (1 = ${taux} Ar)`;
+/* ===== Tabs ===== */
+$$(".tab").forEach(t=>{
+  t.addEventListener("click",()=>{
+    $$(".tab").forEach(x=>x.setAttribute("aria-selected","false"));
+    t.setAttribute("aria-selected","true");
+    const tab=t.dataset.tab;
+    $("#panel-depot").hidden = tab!=="depot";
+    $("#panel-retrait").hidden = tab!=="retrait";
+    $("#panel-transfert").hidden = tab!=="transfert";
+    refreshAll();
   });
+});
+
+/* ===== Pay options (Depot) ===== */
+$("#dep-pay-opts").addEventListener("click",(e)=>{
+  const btn=e.target.closest(".paybtn"); if(!btn) return;
+  payChoice = btn.dataset.pay;
+  $$("#dep-pay-opts .paybtn").forEach(b=>b.setAttribute("aria-pressed", b.dataset.pay===payChoice?"true":"false"));
+  const info = CONFIG.payMap[payChoice];
+  $("#dep-pay-num").textContent = info.num;
+  $("#dep-pay-name").textContent = info.name;
+  $("#dep-pay-logo").textContent = info.label;
+});
+
+/* ===== Accept checkboxes -> enable buttons ===== */
+["dep","ret","trf"].forEach(k=>{
+  $(`#${k}-accept`).addEventListener("change",()=>{
+    $(`#${k}-preview`).disabled = ! $(`#${k}-accept`).checked;
+  });
+});
+
+/* ===== Inputs -> conversions ===== */
+$("#dep-amount-ariary").addEventListener("input", ()=>refreshDepot());
+$("#ret-amount-crypto").addEventListener("input", ()=>refreshRetrait());
+$("#ret-wallet").addEventListener("change", ()=>{
+  const w=$("#ret-wallet").value;
+  const labels={mvola:"Mvola",orange:"Orange Money",airtel:"Airtel Money",skrill:"Skrill",wise:"Wise",paypal:"PayPal"};
+  $("#ret-wallet-note").textContent = (currentLang==="mg"?"Anarana ao amin'ny kaonty ":"Nom dans le compte ") + labels[w];
+});
+$("#trf-amount-top").addEventListener("input", ()=>refreshTransfer());
+
+/* ===== Copy our address (Retrait) ===== */
+$("#ret-copy").addEventListener("click",()=>{
+  $("#ret-our-addr").select(); document.execCommand("copy");
+  $("#ret-msg").textContent = currentLang==="mg"?"Voakopy!":"Copié !";
+  setTimeout(()=>$("#ret-msg").textContent="",1500);
+});
+
+/* ===== Language toggle ===== */
+$("#lang-fr").addEventListener("click", ()=>setLang("fr"));
+$("#lang-mg").addEventListener("click", ()=>setLang("mg"));
+function setLang(l){
+  currentLang=l;
+  $("#lang-fr").classList.toggle("lang-active", l==="fr");
+  $("#lang-mg").classList.toggle("lang-active", l==="mg");
+  // update texts
+  $("[data-i18n='slogan']").textContent = I18N[l].slogan;
+  $("#tab-depot").textContent = I18N[l].depot;
+  $("#tab-retrait").textContent = I18N[l].retrait;
+  $("#tab-transfert").textContent = I18N[l].transfert;
+  $("[data-i18n='envoyer']").textContent = I18N[l].envoyer;
+  $$("#panel-depot [data-i18n='accept'], #panel-retrait [data-i18n='accept'], #panel-transfert [data-i18n='accept']").forEach(n=>n.textContent=I18N[l].accept);
+  $$("#panel-depot [data-i18n='apercu'], #panel-retrait [data-i18n='apercu'], #panel-transfert [data-i18n='apercu']").forEach(n=>n.textContent=I18N[l].apercu);
+  $("#ret-crypto-only").innerHTML = (l==="mg"?"Alefaso amin'ny ":"Envoyer seulement en ") + `<b>${currentCrypto}</b>`;
+  $("#dep-addr-label").textContent = (currentLang==="mg"?"Adiresy ":"Adresse ") + (currentCrypto.toLowerCase());
+}
+
+/* ===== Preview -> mailto ===== */
+$("#dep-preview").addEventListener("click", ()=>sendMail("depot"));
+$("#ret-preview").addEventListener("click", ()=>sendMail("retrait"));
+$("#trf-preview").addEventListener("click", ()=>sendMail("transfert"));
+function sendMail(kind){
+  const subj = `[TakaloCash] ${kind.toUpperCase()} – ${new Date().toLocaleString()}`;
+  let body = "";
+  if(kind==="depot"){
+    body += `SERVICE: DEPOT\nCRYPTO: ${currentCrypto}\nMontant Ariary: ${$("#dep-amount-ariary").value}\nMontant Crypto (estim.): ${$("#dep-amount-crypto").value} ${currentCrypto}\nAdresse de réception: ${$("#dep-addr").value}\nPaiement: ${CONFIG.payMap[payChoice].label} (${CONFIG.payMap[payChoice].num} – ${CONFIG.payMap[payChoice].name})\nTaux: ${rateLine(currentCrypto)}\nFrais: ${(CONFIG.fees.depot*100).toFixed(1)}%\n`;
+  }else if(kind==="retrait"){
+    body += `SERVICE: RETRAIT\nCRYPTO: ${currentCrypto}\nMontant Crypto: ${$("#ret-amount-crypto").value} ${currentCrypto}\nAdresse (anay): ${$("#ret-our-addr").value}\nHafarana: ${$("#ret-amount-ariary").value} MGA\nWallet: ${$("#ret-wallet").value}\nTéléphone: ${$("#ret-phone").value}\nAnarana: ${$("#ret-name").value}\nTaux: ${rateLine(currentCrypto)}\nFrais: ${(CONFIG.fees.retrait*100).toFixed(1)}%\n`;
+  }else{
+    body += `SERVICE: TRANSFERT\nCRYPTO Source: ${currentCrypto}\nMontant Source: ${$("#trf-amount-top").value} ${currentCrypto}\nCRYPTO Cible: ${transferTarget}\nMontant Cible (estim.): ${$("#trf-amount-bot").value} ${transferTarget}\nTaux: 1 ${currentCrypto} = ${crossRate(currentCrypto, transferTarget)} ${transferTarget}\nFrais: ${(CONFIG.fees.transfert*100).toFixed(1)}%\n`;
+  }
+  const mail = `mailto:${encodeURIComponent(CONFIG.emailTo)}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`;
+  window.location.href = mail;
+}
+
+/* ===== Footer CTAs ===== */
+$("#cta-email").addEventListener("click",()=>window.location.href=`mailto:${CONFIG.emailTo}`);
+$("#cta-call").addEventListener("click",()=>window.location.href=`tel:${CONFIG.phoneCall}`);
+$("#cta-fb").addEventListener("click",()=>window.open(CONFIG.facebookUrl,"_blank"));
+
+/* ===== Legal modals ===== */
+$$(".legal a").forEach(a=>{
+  a.addEventListener("click",()=>$("#dlg-"+a.dataset.modal).showModal());
+});
+
+/* ===== Helpers ===== */
+function rateLine(sym){
+  const mg = CONFIG.ratesMGA[sym];
+  return `1 ${sym} = ${mg.toLocaleString()} MGA`;
+}
+function crossRate(a,b){
+  const rateA = CONFIG.ratesMGA[a];
+  const rateB = CONFIG.ratesMGA[b];
+  if(!rateA || !rateB) return "—";
+  return +(rateA/rateB).toFixed(8);
+}
+function applyFee(amount, fee){ return amount * (1 - fee); }
+
+/* ===== Refreshers ===== */
+function refreshDepot(){
+  // ariary -> crypto (minus fee)
+  const mga = +($("#dep-amount-ariary").value || 0);
+  const unitMGA = CONFIG.ratesMGA[currentCrypto] || 0;
+  const crypto = unitMGA ? applyFee(mga/unitMGA, CONFIG.fees.depot) : 0;
+  $("#dep-amount-crypto").value = crypto ? crypto.toFixed(8) : "";
+  $("#dep-crypto-suffix").textContent = currentCrypto;
+  $("#dep-rate-note").textContent = rateLine(currentCrypto);
+  $("#dep-fee-note").textContent = "Frais: " + (CONFIG.fees.depot*100).toFixed(1) + "%";
+  $("#dep-addr-label").textContent = (currentLang==="mg"?"Adiresy ":"Adresse ") + (currentCrypto.toLowerCase());
+}
+function refreshRetrait(){
+  // crypto -> ariary (minus fee)
+  const qty = +($("#ret-amount-crypto").value || 0);
+  const unitMGA = CONFIG.ratesMGA[currentCrypto] || 0;
+  const mga = applyFee(qty*unitMGA, CONFIG.fees.retrait);
+  $("#ret-amount-ariary").value = mga ? Math.round(mga).toLocaleString() : "";
+  $("#ret-rate-note").textContent = rateLine(currentCrypto);
+  $("#ret-fee-note").textContent = "Frais: " + (CONFIG.fees.retrait*100).toFixed(1) + "%";
+  $("#ret-crypto-suffix").textContent = currentCrypto;
+  $("#ret-our-addr").value = CONFIG.ourAddresses[currentCrypto] || "";
+  $("#ret-crypto-only").innerHTML = (currentLang==="mg"?"Alefaso amin'ny ":"Envoyer seulement en ")+`<b>${currentCrypto}</b>`;
+}
+function refreshTransfer(){
+  const qty = +($("#trf-amount-top").value || 0);
+  const r = crossRate(currentCrypto, transferTarget);
+  const out = applyFee(qty * (Number(r)||0), CONFIG.fees.transfert);
+  $("#trf-amount-bot").value = out ? out.toFixed(8) : "";
+  $("#trf-top-suffix").textContent = currentCrypto;
+  $("#trf-bot-suffix").textContent = transferTarget;
+  $("#trf-top-note").textContent = (currentLang==="mg"?"Crypto loharano: ":"Crypto source: ") + currentCrypto;
+  $("#trf-rate-note").textContent = `1 ${currentCrypto} = ${r} ${transferTarget}`;
+  // update transfer chips active state
+  $$("#cryptoStripTransfer .chip").forEach(b=>b.setAttribute("aria-pressed", b.dataset.sym===transferTarget?"true":"false"));
+}
+function refreshAll(){
+  // chips active state
+  $$("#cryptoStrip .chip").forEach(b=>b.setAttribute("aria-pressed", b.dataset.sym===currentCrypto?"true":"false"));
+  refreshDepot();
+  refreshRetrait();
+  refreshTransfer();
+}
+refreshAll();
 </script>
-
 </body>
 </html>
