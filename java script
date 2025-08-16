@@ -1,185 +1,193 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="mg">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TakaloCash – Simple • Rapide • Sécurisé</title>
-    <style>
-        /* [Vos styles CSS existants] */
-        .refresh-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        
-        .refresh-btn {
-            background: var(--brand);
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: transform 0.3s;
-        }
-        
-        .refresh-btn:hover {
-            transform: rotate(180deg);
-            background: var(--brand-2);
-        }
-        
-        .refresh-btn:active {
-            transform: rotate(360deg);
-        }
-        
-        .last-updated {
-            font-size: 14px;
-            color: var(--muted);
-        }
-        
-        .status-indicator {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            margin-left: 8px;
-        }
-        
-        .status-success {
-            background-color: var(--ok);
-        }
-        
-        .status-error {
-            background-color: var(--danger);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TakaloCash Services</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f8f8f8;
+    }
+    header {
+      background: #222;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2em;
+    }
+    header p {
+      margin: 5px 0 0;
+      font-style: italic;
+    }
+    nav {
+      text-align: right;
+      padding: 10px;
+      background: #eee;
+    }
+    nav select {
+      padding: 5px;
+    }
+    main {
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+    }
+    section {
+      background: white;
+      margin-bottom: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    section h2 {
+      margin-top: 0;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input, select, button {
+      padding: 8px;
+      margin-top: 5px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    button {
+      background: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+    }
+    footer {
+      text-align: center;
+      padding: 15px;
+      font-size: 0.9em;
+      background: #222;
+      color: white;
+    }
+    .contact-buttons img {
+      width: 32px;
+      margin: 0 5px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-    <!-- [Votre structure HTML existante] -->
-    
-    <div class="refresh-container">
-        <button class="refresh-btn" id="manual-refresh">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2">
-                <path d="M23 4v6h-6M1 20v-6h6"></path>
-                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
-            </svg>
-        </button>
-        <div class="last-updated">
-            Dernière mise à jour: <span id="last-update-time">--:--:--</span>
-            <span id="status-indicator" class="status-indicator"></span>
-        </div>
-    </div>
-    
-    <!-- [Le reste de votre HTML] -->
 
-    <script>
-        /* ================== CONFIG ================== */
-        const CONFIG = {
-            // [Votre configuration existante]
-        };
+<header>
+  <h1>TakaloCash Services</h1>
+  <p>Simple - Rapide - Sécurisé</p>
+</header>
 
-        /* ================== INIT ================== */
-        const $ = s => document.querySelector(s);
-        const $$ = s => document.querySelectorAll(s);
-        
-        let lastUpdateTime = null;
-        let isUpdating = false;
+<nav>
+  <label for="lang-select">Langue: </label>
+  <select id="lang-select">
+    <option value="fr">Français</option>
+    <option value="mg">Malagasy</option>
+  </select>
+</nav>
 
-        /* ===== Fonctions de mise à jour ===== */
-        async function updateRates() {
-            if (isUpdating) return;
-            
-            isUpdating = true;
-            const statusIndicator = $("#status-indicator");
-            
-            try {
-                // Afficher le statut de chargement
-                statusIndicator.className = "status-indicator";
-                statusIndicator.style.backgroundColor = "transparent";
-                statusIndicator.style.border = "2px solid var(--brand)";
-                statusIndicator.style.animation = "spin 1s linear infinite";
-                
-                // Simuler un délai pour voir l'animation (à supprimer en production)
-                await new Promise(resolve => setTimeout(resolve, 500));
-                
-                // Récupérer les nouveaux taux
-                const newRates = await fetchNewRates();
-                
-                // Mettre à jour les taux dans CONFIG
-                Object.assign(CONFIG.ratesMGA, newRates);
-                
-                // Mettre à jour l'affichage
-                refreshUI();
-                
-                // Mettre à jour l'heure
-                lastUpdateTime = new Date();
-                $("#last-update-time").textContent = formatTime(lastUpdateTime);
-                
-                // Afficher le succès
-                statusIndicator.className = "status-indicator status-success";
-                statusIndicator.style.animation = "none";
-                
-                toast("Taux mis à jour avec succès");
-                
-            } catch (error) {
-                console.error("Erreur de mise à jour:", error);
-                statusIndicator.className = "status-indicator status-error";
-                statusIndicator.style.animation = "none";
-                
-                toast("Erreur lors de la mise à jour des taux", 3000);
-            } finally {
-                isUpdating = false;
-            }
-        }
+<main>
+  <!-- DEPOT -->
+  <section id="depot">
+    <h2>Dépôt</h2>
+    <label>Montant en Ariary:</label>
+    <input type="number" id="montant-ariary" placeholder="Montant en Ariary">
 
-        async function fetchNewRates() {
-            // Implémentez votre logique de récupération des taux ici
-            // Retourne un objet avec les nouveaux taux (ex: {BTC: 150000000, ETH: 9000000})
-            
-            // Exemple avec des données simulées
-            return {
-                BTC: 150000000 + Math.floor(Math.random() * 1000000),
-                ETH: 9000000 + Math.floor(Math.random() * 100000),
-                USDT: 4500 + Math.floor(Math.random() * 100)
-            };
-        }
+    <label>Méthode de paiement:</label>
+    <select id="methode">
+      <option value="mvola">MVola</option>
+      <option value="orange">Orange Money</option>
+      <option value="airtel">Airtel Money</option>
+    </select>
 
-        function refreshUI() {
-            // Implémentez votre logique de rafraîchissement de l'interface ici
-            console.log("UI rafraîchie avec les nouveaux taux:", CONFIG.ratesMGA);
-        }
+    <p id="coordonnees"></p>
 
-        function formatTime(date) {
-            return date.toLocaleTimeString('fr-FR');
-        }
+    <label>Crypto:</label>
+    <select id="crypto">
+      <option value="btc">Bitcoin</option>
+      <option value="usdt">USDT</option>
+    </select>
 
-        function toast(message, duration = 2000) {
-            const toast = $("#toast");
-            toast.textContent = message;
-            toast.classList.add("show");
-            
-            setTimeout(() => {
-                toast.classList.remove("show");
-            }, duration);
-        }
+    <p id="conversion"></p>
 
-        /* ===== Initialisation ===== */
-        document.addEventListener('DOMContentLoaded', () => {
-            // Bouton de rafraîchissement manuel
-            $("#manual-refresh").addEventListener('click', updateRates);
-            
-            // Première mise à jour au chargement
-            updateRates();
-        });
+    <label>
+      <input type="checkbox" id="coche"> J'accepte les conditions
+    </label>
 
-        /* Animation de rotation */
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-    </script>
+    <button id="apercu" disabled>Aperçu</button>
+  </section>
+
+  <!-- RETRAIT -->
+  <section id="retrait">
+    <h2>Retrait</h2>
+    <label>Montant en Crypto:</label>
+    <input type="number" id="montant-crypto" placeholder="Montant en crypto">
+    <label>Adresse de réception:</label>
+    <input type="text" id="adresse-retrait" placeholder="Votre adresse">
+    <label>
+      <input type="checkbox" id="coche-retrait"> J'accepte les conditions
+    </label>
+    <button id="apercu-retrait" disabled>Aperçu</button>
+  </section>
+
+</main>
+
+<footer>
+  <div class="contact-buttons">
+    <img src="email-icon.png" alt="Email">
+    <img src="phone-icon.png" alt="Appel">
+    <img src="facebook-icon.png" alt="Facebook">
+  </div>
+  <p>Conditions | Règles | Politique</p>
+</footer>
+
+<script>
+  // Gestion coordonnées dépôt
+  const methodeSelect = document.getElementById('methode');
+  const coordonneesP = document.getElementById('coordonnees');
+  methodeSelect.addEventListener('change', () => {
+    if(methodeSelect.value === 'mvola'){
+      coordonneesP.textContent = "034xxxxxxx - Julio Landry";
+    } else if(methodeSelect.value === 'orange'){
+      coordonneesP.textContent = "0324923117 - Julio Landry";
+    } else if(methodeSelect.value === 'airtel'){
+      coordonneesP.textContent = "0331483290 - Julio RANDRIANARIMANANA";
+    }
+  });
+
+  // Checkbox activation bouton
+  const coche = document.getElementById('coche');
+  const apercuBtn = document.getElementById('apercu');
+  coche.addEventListener('change', () => {
+    apercuBtn.disabled = !coche.checked;
+  });
+
+  const cocheRetrait = document.getElementById('coche-retrait');
+  const apercuRetraitBtn = document.getElementById('apercu-retrait');
+  cocheRetrait.addEventListener('change', () => {
+    apercuRetraitBtn.disabled = !cocheRetrait.checked;
+  });
+
+  // Conversion automatique Ariary -> Crypto (exemple)
+  const montantAriaryInput = document.getElementById('montant-ariary');
+  const cryptoSelect = document.getElementById('crypto');
+  const conversionP = document.getElementById('conversion');
+  montantAriaryInput.addEventListener('input', () => {
+    let taux = (cryptoSelect.value === 'btc') ? 123000 : 4500; // exemple
+    let montantCrypto = montantAriaryInput.value / taux;
+    conversionP.textContent = `Équivaut à: ${montantCrypto.toFixed(6)} ${cryptoSelect.value.toUpperCase()} (1 = ${taux} Ar)`;
+  });
+</script>
+
 </body>
 </html>
