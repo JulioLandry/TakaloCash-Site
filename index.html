@@ -19,10 +19,10 @@
   *{box-sizing:border-box}
   body{
     margin:0;
-    font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans";
-    color:#111;background:white;line-height:1.35;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+    color:#111;background:white;
+    line-height:1.35;
   }
-  /* ===== Header ===== */
   header{
     background: var(--dark);
     color:#fff;
@@ -34,18 +34,25 @@
     display:flex;align-items:center;justify-content:space-between;gap:12px;
     max-width:980px;margin:0 auto;
   }
-  .brand{display:flex;flex-direction:column}
-  .brand .title{
-    font-weight:1000;letter-spacing:.5px;font-size:30px;color:var(--brand)
+  .brand{
+    font-weight:900;letter-spacing:.5px;
+    display:flex;flex-direction:column
   }
-  .brand .subtitle{
-    margin-top:6px;display:inline-block;padding:6px 12px;background:#eee;color:#111;
-    border-radius:8px;font-weight:800;letter-spacing:3px;text-transform:lowercase
+  .brand span:first-child{
+    font-size:28px;color:var(--brand)
+  }
+  .brand small{
+    margin-top:2px;
+    display:inline-block;
+    padding:6px 12px;
+    background:#eee;color:#111;border-radius:8px;
+    font-weight:700;letter-spacing:3px;text-transform:lowercase
   }
   .flags{display:flex;gap:8px}
   .flag{
-    width:28px;height:18px;border-radius:3px;overflow:hidden;cursor:pointer;border:1px solid #0003;background:#fff;
+    width:28px;height:18px;border-radius:3px;overflow:hidden;cursor:pointer;border:1px solid #0003
   }
+  /* simple svg flags look */
   .lang-active{outline:2px solid var(--brand)}
   .tabs{
     display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;
@@ -59,7 +66,6 @@
   }
   .tab[aria-selected="true"]{background:#111;color:#fff;box-shadow:0 3px 0 #000}
   main{max-width:980px;margin:18px auto;padding:0 12px 80px}
-  /* ===== common UI ===== */
   .crypto-strip{
     display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0 16px
   }
@@ -73,13 +79,17 @@
     box-shadow:0 10px 30px rgba(0,0,0,.06);margin-bottom:14px
   }
   .row{display:flex;gap:10px;align-items:center}
-  .field{flex:1;position:relative}
+  .field{
+    flex:1;position:relative
+  }
   .field input, .field select, .field textarea{
     width:100%;padding:14px 14px 14px 14px;border-radius:12px;border:1px solid #ddd;background:#f9f9f9;
     font-size:16px;outline:none
   }
   .field textarea{min-height:80px;resize:vertical}
-  .label{font-size:13px;color:#444;margin-bottom:6px;font-weight:800;letter-spacing:.2px}
+  .label{
+    font-size:13px;color:#444;margin-bottom:6px;font-weight:800;letter-spacing:.2px
+  }
   .suffix{
     position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:12px;font-weight:800;
     background:#111;color:#fff;border-radius:10px;padding:4px 8px
@@ -93,14 +103,19 @@
     border:1px solid #ddd;background:#fff;border-radius:12px;padding:8px 10px;cursor:pointer;font-weight:800
   }
   .paybtn[aria-pressed="true"]{background:#111;color:#fff;border-color:#000}
-  .checkbox{display:flex;gap:8px;align-items:flex-start;margin-top:6px}
+  .checkbox{
+    display:flex;gap:8px;align-items:flex-start;margin-top:6px
+  }
   .actions{display:flex;gap:10px;align-items:center;margin-top:10px}
-  .btn{border:none;border-radius:16px;padding:12px 16px;font-weight:900;cursor:pointer}
+  .btn{
+    border:none;border-radius:16px;padding:12px 16px;font-weight:900;cursor:pointer
+  }
   .btn-primary{background:var(--brand);color:#111}
   .btn-primary:disabled{opacity:.5;cursor:not-allowed}
   .btn-ghost{background:#000;color:#fff}
-  /* ===== footer ===== */
-  footer{background:#111;color:#fff;padding:24px 12px 40px}
+  footer{
+    background:#111;color:#fff;padding:24px 12px 40px
+  }
   .footer-wrap{max-width:980px;margin:0 auto}
   .cta{display:flex;gap:10px;flex-wrap:wrap}
   .ctabtn{border:none;border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:900}
@@ -120,8 +135,8 @@
 <header>
   <div class="topbar">
     <div class="brand">
-      <div class="title">TAKALOCASH</div>
-      <div class="subtitle" id="slogan" data-i18n="slogan">Simple – rapide – sécurisé</div>
+      <span>TAKALOCASH</span>
+      <small id="slogan" data-i18n="slogan">Simple – rapide – sécurisé</small>
     </div>
     <div class="flags" aria-label="Language">
       <!-- FR -->
@@ -152,9 +167,13 @@
 
 <main>
   <!-- Crypto strip -->
-  <div class="crypto-strip" id="cryptoStrip" aria-label="Cryptos"></div>
+  <div class="crypto-strip" id="cryptoStrip" aria-label="Cryptos">
+    <!-- chips are injected by JS from CONFIG.cryptos -->
+  </div>
 
-  <!-- ================== DEPOT ================== -->
+  <!-- ====== PANELS ====== -->
+
+  <!-- DEPOT -->
   <section id="panel-depot" class="panel" role="tabpanel" aria-labelledby="tab-depot">
     <div class="grid">
       <div>
@@ -168,9 +187,6 @@
             <button class="paybtn" data-pay="mvola" aria-pressed="true">Mvola</button>
             <button class="paybtn" data-pay="orange">Orange Money</button>
             <button class="paybtn" data-pay="airtel">Airtel Money</button>
-            <button class="paybtn" data-pay="skrill">Skrill</button>
-            <button class="paybtn" data-pay="wise">Wise</button>
-            <button class="paybtn" data-pay="paypal">PayPal</button>
           </div>
           <div class="muted" id="dep-pay-hint">Envoyer à <span class="pill-hl" id="dep-pay-num">0347451051</span> — Nom: <b id="dep-pay-name">Julio Landry</b></div>
         </div>
@@ -189,7 +205,7 @@
         <div class="label" id="dep-addr-label">Adresse bitcoin</div>
         <div class="row">
           <div class="field">
-            <input id="dep-addr" type="text" placeholder="Adresse de réception (ex: bc1... / 0x... / TRC20...)" />
+            <input id="dep-addr" type="text" placeholder="Adresse de réception (par ex. bc1...)" />
           </div>
         </div>
       </div>
@@ -205,7 +221,7 @@
     </div>
   </section>
 
-  <!-- ================== RETRAIT ================== -->
+  <!-- RETRAIT -->
   <section id="panel-retrait" class="panel" role="tabpanel" aria-labelledby="tab-retrait" hidden>
     <div class="grid">
       <div>
@@ -237,18 +253,15 @@
           <div id="ret-fee-note">Frais: 0,5%</div>
         </div>
 
-        <div class="label">Numéro (réception)</div>
+        <div class="label">Numéro téléphone (réception)</div>
         <div class="row">
           <div class="field">
-            <input id="ret-phone" type="tel" placeholder="Numéro de mobile money / e-wallet" />
+            <input id="ret-phone" type="tel" placeholder="Numéro de mobile money" />
           </div>
-          <select id="ret-wallet" title="Wallet" style="padding:12px;border-radius:12px;border:1px solid #ddd;background:#fff">
+          <select id="ret-wallet" title="Mobile money" style="padding:12px;border-radius:12px;border:1px solid #ddd;background:#fff">
             <option value="mvola">Mvola</option>
             <option value="orange">Orange Money</option>
             <option value="airtel">Airtel Money</option>
-            <option value="skrill">Skrill</option>
-            <option value="wise">Wise</option>
-            <option value="paypal">PayPal</option>
           </select>
         </div>
         <div class="note muted" id="ret-wallet-note">Nom dans le compte Mvola</div>
@@ -268,7 +281,7 @@
     </div>
   </section>
 
-  <!-- ================== TRANSFERT ================== -->
+  <!-- TRANSFERT -->
   <section id="panel-transfert" class="panel" role="tabpanel" aria-labelledby="tab-transfert" hidden>
     <div class="grid">
       <div>
@@ -373,14 +386,11 @@ const CONFIG = {
     retrait: 0.005,  // 0.5%
     transfert: 0.004 // 0.4% ohatra
   },
-  // Pay options (including e-wallets)
+  // Mobile money choices
   payMap: {
-    mvola:  {label:"Mvola",  num:"0347451051", name:"Julio Landry"},
-    orange: {label:"Orange Money", num:"0324923117", name:"Julio Landry"},
-    airtel: {label:"Airtel Money", num:"0331483290", name:"Julio RANDRIANARIMANANA"},
-    skrill: {label:"Skrill", num:"your-skrill-id@email", name:"TakaloCash"},
-    wise:   {label:"Wise",   num:"wise-username-or-IBAN", name:"TakaloCash"},
-    paypal: {label:"PayPal", num:"paypal@takalocash.mg", name:"TakaloCash"}
+    mvola:  {num:"0347451051", name:"Julio Landry"},
+    orange: {num:"0324923117", name:"Julio Landry"},
+    airtel: {num:"0331483290", name:"Julio RANDRIANARIMANANA"}
   }
 };
 // i18n simple
@@ -393,7 +403,7 @@ const I18N = {
   },
   mg: {
     slogan: "Tsotra – haingana – azo antoka",
-    depot: "DÉPÔT", retrait: "RETRAIT", transfert:"TRANSFERT",
+    depot: "DÉPÔT", retrait: "RETRAIT", transfert:"TRANSFERT", // mitazona teny pôlitika amin’ny sary
     envoyer:"Fandefasana", accept:"Manamarina aho fa namaky sy manaiky tsy misy fepetra ny fepetra fampiasana ny tranonkala.",
     apercu:"Aperçu", adresse_nou:"Adiresy (anay)"
   }
@@ -404,11 +414,11 @@ let currentCrypto = "BTC";
 let transferTarget = "USDT";
 let payChoice = "mvola";
 
-/* ======= DOM helpers ======= */
+/* ======= INIT UI ======= */
 const $ = s=>document.querySelector(s);
 const $$ = s=>document.querySelectorAll(s);
 
-/* ===== Build crypto chips ===== */
+// build crypto chips
 function buildChips(){
   const strip = $("#cryptoStrip");
   strip.innerHTML="";
@@ -419,22 +429,21 @@ function buildChips(){
     b.addEventListener("click", ()=>{ currentCrypto=sym; refreshAll(); });
     strip.appendChild(b);
   });
-  // transfer target chips
+  // transfer strip
   const tstrip=$("#cryptoStripTransfer");
-  if(tstrip){
-    tstrip.innerHTML="";
-    CONFIG.cryptos.forEach(sym=>{
-      const b=document.createElement("button");
-      b.className="chip"; b.textContent=sym; b.dataset.sym=sym;
-      b.setAttribute("aria-pressed", sym===transferTarget ? "true":"false");
-      b.addEventListener("click", ()=>{ transferTarget=sym; refreshTransfer(); });
-      tstrip.appendChild(b);
-    });
-  }
+  tstrip.innerHTML="";
+  CONFIG.cryptos.forEach(sym=>{
+    if(sym===currentCrypto){ /* can still allow; but better exclude? keep included */ }
+    const b=document.createElement("button");
+    b.className="chip"; b.textContent=sym; b.dataset.sym=sym;
+    b.setAttribute("aria-pressed", sym===transferTarget ? "true":"false");
+    b.addEventListener("click", ()=>{ transferTarget=sym; refreshTransfer(); });
+    tstrip.appendChild(b);
+  });
 }
 buildChips();
 
-/* ===== Tabs ===== */
+/* Tabs */
 $$(".tab").forEach(t=>{
   t.addEventListener("click",()=>{
     $$(".tab").forEach(x=>x.setAttribute("aria-selected","false"));
@@ -447,7 +456,7 @@ $$(".tab").forEach(t=>{
   });
 });
 
-/* ===== Pay options (Depot) ===== */
+/* Pay options (Depot) */
 $("#dep-pay-opts").addEventListener("click",(e)=>{
   const btn=e.target.closest(".paybtn"); if(!btn) return;
   payChoice = btn.dataset.pay;
@@ -455,34 +464,34 @@ $("#dep-pay-opts").addEventListener("click",(e)=>{
   const info = CONFIG.payMap[payChoice];
   $("#dep-pay-num").textContent = info.num;
   $("#dep-pay-name").textContent = info.name;
-  $("#dep-pay-logo").textContent = info.label;
+  $("#dep-pay-logo").textContent = btn.textContent;
 });
 
-/* ===== Accept checkboxes -> enable buttons ===== */
+/* Accept checkboxes */
 ["dep","ret","trf"].forEach(k=>{
   $(`#${k}-accept`).addEventListener("change",()=>{
     $(`#${k}-preview`).disabled = ! $(`#${k}-accept`).checked;
   });
 });
 
-/* ===== Inputs -> conversions ===== */
+/* Inputs -> conversions */
 $("#dep-amount-ariary").addEventListener("input", ()=>refreshDepot());
 $("#ret-amount-crypto").addEventListener("input", ()=>refreshRetrait());
 $("#ret-wallet").addEventListener("change", ()=>{
   const w=$("#ret-wallet").value;
-  const labels={mvola:"Mvola",orange:"Orange Money",airtel:"Airtel Money",skrill:"Skrill",wise:"Wise",paypal:"PayPal"};
-  $("#ret-wallet-note").textContent = (currentLang==="mg"?"Anarana ao amin'ny kaonty ":"Nom dans le compte ") + labels[w];
+  const map={mvola:"Mvola",orange:"Orange Money",airtel:"Airtel Money"};
+  $("#ret-wallet-note").textContent = (currentLang==="mg"?"Anarana ao amin'ny kaonty ":"Nom dans le compte ")+map[w];
 });
 $("#trf-amount-top").addEventListener("input", ()=>refreshTransfer());
 
-/* ===== Copy our address (Retrait) ===== */
+/* Copy */
 $("#ret-copy").addEventListener("click",()=>{
   $("#ret-our-addr").select(); document.execCommand("copy");
   $("#ret-msg").textContent = currentLang==="mg"?"Voakopy!":"Copié !";
   setTimeout(()=>$("#ret-msg").textContent="",1500);
 });
 
-/* ===== Language toggle ===== */
+/* Language */
 $("#lang-fr").addEventListener("click", ()=>setLang("fr"));
 $("#lang-mg").addEventListener("click", ()=>setLang("mg"));
 function setLang(l){
@@ -498,10 +507,10 @@ function setLang(l){
   $$("#panel-depot [data-i18n='accept'], #panel-retrait [data-i18n='accept'], #panel-transfert [data-i18n='accept']").forEach(n=>n.textContent=I18N[l].accept);
   $$("#panel-depot [data-i18n='apercu'], #panel-retrait [data-i18n='apercu'], #panel-transfert [data-i18n='apercu']").forEach(n=>n.textContent=I18N[l].apercu);
   $("#ret-crypto-only").innerHTML = (l==="mg"?"Alefaso amin'ny ":"Envoyer seulement en ") + `<b>${currentCrypto}</b>`;
-  $("#dep-addr-label").textContent = (currentLang==="mg"?"Adiresy ":"Adresse ") + (currentCrypto.toLowerCase());
+  $("#dep-addr-label").textContent = (currentLang==="mg"?"Adiresy ":"Adresse ") + (currentCrypto==="USDT"?"USDT": currentCrypto.toLowerCase());
 }
 
-/* ===== Preview -> mailto ===== */
+/* Preview (mailto) */
 $("#dep-preview").addEventListener("click", ()=>sendMail("depot"));
 $("#ret-preview").addEventListener("click", ()=>sendMail("retrait"));
 $("#trf-preview").addEventListener("click", ()=>sendMail("transfert"));
@@ -509,7 +518,7 @@ function sendMail(kind){
   const subj = `[TakaloCash] ${kind.toUpperCase()} – ${new Date().toLocaleString()}`;
   let body = "";
   if(kind==="depot"){
-    body += `SERVICE: DEPOT\nCRYPTO: ${currentCrypto}\nMontant Ariary: ${$("#dep-amount-ariary").value}\nMontant Crypto (estim.): ${$("#dep-amount-crypto").value} ${currentCrypto}\nAdresse de réception: ${$("#dep-addr").value}\nPaiement: ${CONFIG.payMap[payChoice].label} (${CONFIG.payMap[payChoice].num} – ${CONFIG.payMap[payChoice].name})\nTaux: ${rateLine(currentCrypto)}\nFrais: ${(CONFIG.fees.depot*100).toFixed(1)}%\n`;
+    body += `SERVICE: DEPOT\nCRYPTO: ${currentCrypto}\nMontant Ariary: ${$("#dep-amount-ariary").value}\nMontant Crypto (estim.): ${$("#dep-amount-crypto").value} ${currentCrypto}\nAdresse de réception: ${$("#dep-addr").value}\nPaiement: ${payChoice} (${CONFIG.payMap[payChoice].num} – ${CONFIG.payMap[payChoice].name})\nTaux: ${rateLine(currentCrypto)}\nFrais: ${(CONFIG.fees.depot*100).toFixed(1)}%\n`;
   }else if(kind==="retrait"){
     body += `SERVICE: RETRAIT\nCRYPTO: ${currentCrypto}\nMontant Crypto: ${$("#ret-amount-crypto").value} ${currentCrypto}\nAdresse (anay): ${$("#ret-our-addr").value}\nHafarana: ${$("#ret-amount-ariary").value} MGA\nWallet: ${$("#ret-wallet").value}\nTéléphone: ${$("#ret-phone").value}\nAnarana: ${$("#ret-name").value}\nTaux: ${rateLine(currentCrypto)}\nFrais: ${(CONFIG.fees.retrait*100).toFixed(1)}%\n`;
   }else{
@@ -519,14 +528,16 @@ function sendMail(kind){
   window.location.href = mail;
 }
 
-/* ===== Footer CTAs ===== */
+/* Footer CTAs */
 $("#cta-email").addEventListener("click",()=>window.location.href=`mailto:${CONFIG.emailTo}`);
 $("#cta-call").addEventListener("click",()=>window.location.href=`tel:${CONFIG.phoneCall}`);
 $("#cta-fb").addEventListener("click",()=>window.open(CONFIG.facebookUrl,"_blank"));
 
-/* ===== Legal modals ===== */
+/* Legal modals */
 $$(".legal a").forEach(a=>{
-  a.addEventListener("click",()=>$("#dlg-"+a.dataset.modal).showModal());
+  a.addEventListener("click",()=>{
+    $("#dlg-"+a.dataset.modal).showModal();
+  });
 });
 
 /* ===== Helpers ===== */
@@ -579,10 +590,14 @@ function refreshTransfer(){
   $$("#cryptoStripTransfer .chip").forEach(b=>b.setAttribute("aria-pressed", b.dataset.sym===transferTarget?"true":"false"));
 }
 function refreshAll(){
-  // chips active state
+  // chips
   $$("#cryptoStrip .chip").forEach(b=>b.setAttribute("aria-pressed", b.dataset.sym===currentCrypto?"true":"false"));
+  // depot
+  $("#dep-crypto-suffix").textContent=currentCrypto;
   refreshDepot();
+  // retrait
   refreshRetrait();
+  // transfert
   refreshTransfer();
 }
 refreshAll();
