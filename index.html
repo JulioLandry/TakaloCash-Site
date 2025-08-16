@@ -606,13 +606,12 @@
     <main>
         <section id="panel-depot" class="panel" role="tabpanel" aria-labelledby="tab-depot">
             <div class="refresh-section">
-                <button class="refresh-btn" id="refresh-rates" title="Rafraîchir les taux">
+                <button class="refresh-btn" id="refresh-rates" title="Vérifier les taux">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M23 4v6h-6M1 20v-6h6"></path>
-                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </button>
-                <div class="last-updated" id="last-updated">Dernière mise à jour: --:--:--</div>
+                <div class="last-updated" id="last-updated">Taux configurés manuellement</div>
             </div>
             
             <div class="row">
@@ -659,7 +658,7 @@
                         <span class="suffix" id="dep-crypto-suffix">BTC</span>
                     </div>
                     <div class="note muted">
-                        <div id="dep-rate-note">1 BTC = … MGA <span id="rate-loading" class="loading" style="display:none;"></span></div>
+                        <div id="dep-rate-note">1 BTC = 150,000,000 MGA</div>
                         <div id="dep-fee-note">Frais: 0,3%</div>
                     </div>
                     
@@ -726,13 +725,7 @@
     <script>
         /* ================== CONFIG ================== */
         const CONFIG = {
-            // ---- Crypto API ----
-            coingeckoApi: "https://api.coingecko.com/api/v3",
-            cryptosToFetch: ["bitcoin", "ethereum", "litecoin", "bitcoin-cash", "tether"],
-            vsCurrency: "usd",
-            // ---- Exchange rate API ----
-            exchangeRateApi: "https://api.exchangerate-api.com/v4/latest/USD",
-            // ---- Our receiving addresses / IDs ----
+            // ---- Nos wallets ----
             wallets: {
                 mvola: {label: "Mvola", num: "0347451051", name: "Julio Landry"},
                 orange: {label: "Orange Money", num: "0324923117", name: "Julio Landry"},
@@ -747,34 +740,24 @@
                 ETH: "0xEXEMPLEETHADDRESS",
                 LTC: "ltc1qEXEMPLE",
                 BCH: "qzEXEMPLEBCH",
-                USDT: "TEXEMPLEUSDT",
-                USDC: "0xEXEMPLEUSDC",
-                BUSD: "0xEXEMPLEBUSD",
-                DAI: "0xEXEMPLEDAI",
-                ADA: "addr1EXEMPLEADA",
-                SOL: "SoLExemple1111",
-                DOT: "dotEXEMPLE",
-                LINK: "0xEXEMPLELINK",
-                UNI: "0xEXEMPLEUNI",
-                CAKE: "0xEXEMPLECAKE"
+                USDT: "TEXEMPLEUSDT"
             },
             cryptosPrimary: ["BTC", "ETH", "USDT", "LTC", "BCH"],
-            cryptosExtra: ["USDC", "BUSD", "DAI", "ADA", "SOL", "DOT", "LINK", "UNI", "CAKE"],
-            ewalletsPrimary: ["wise", "paypal", "skrill", "payoneer"],
-            // Taux par défaut (seront mis à jour par l'API)
+            // ---- Taux manuels ----
             ratesMGA: {
-                BTC: 150_000_000, ETH: 9_000_000, LTC: 350_000, BCH: 2_800_000,
-                USDT: 4_500, USDC: 4_500, BUSD: 4_500, DAI: 4_500,
-                ADA: 1_200, SOL: 700_000, DOT: 120_000, LINK: 80_000, UNI: 60_000, CAKE: 30_000
+                BTC: 150_000_000,   // 1 BTC = 150M MGA
+                ETH: 9_000_000,     // 1 ETH = 9M MGA
+                LTC: 350_000,       // 1 LTC = 350k MGA
+                BCH: 2_800_000,     // 1 BCH = 2.8M MGA
+                USDT: 4_500         // 1 USDT = 4,500 MGA
             },
-            fees: {depot: 0.003, retrait: 0.005, transfert: 0.004}
+            fees: { depot: 0.003, retrait: 0.005, transfert: 0.004 }
         };
         
-        /* ================== INIT ================== */
+        /* ================== HELPERS ================== */
         const $ = s => document.querySelector(s);
         const $$ = s => document.querySelectorAll(s);
         
-        // Fonction pour afficher les notifications
         function toast(msg, ms = 3000) {
             const t = $("#toast");
             t.textContent = msg;
@@ -782,7 +765,6 @@
             setTimeout(() => t.classList.remove("show"), ms);
         }
         
-        // Fonction pour formater la date/heure
         function formatTime(date) {
             return new Intl.DateTimeFormat('fr-FR', {
                 hour: '2-digit',
@@ -791,79 +773,22 @@
             }).format(date);
         }
         
-        // Fonction pour mettre à jour l'heure de dernière mise à jour
-        function updateLastUpdatedTime() {
-            const now = new Date();
-            $("#last-updated").textContent = `Dernière mise à jour: ${formatTime(now)}`;
-        }
-        
         /* ===== State ===== */
         let currentCrypto = "BTC";
         let payChoice = "mvola";
         let showMoreCryptos = false, showMoreEwallets = false;
         
-        /* ===== API Functions ===== */
-        async function fetchExchangeRates() {
-            try {
-                // Affiche l'indicateur de chargement
-                $("#rate-loading").style.display = "inline-block";
-                
-                // 1. Récupère le taux USD-MGA
-                const exchangeResponse = await fetch(CONFIG.exchangeRateApi);
-                const exchangeData = await exchangeResponse.json();
-                const usdToMgaRate = exchangeData.rates.MGA || 4500;
-                
-                // 2. Récupère les prix crypto en USD
-                const ids = CONFIG.cryptosToFetch.join(",");
-                const cryptoUrl = `${CONFIG.coingeckoApi}/simple/price?ids=${ids}&vs_currencies=${CONFIG.vsCurrency}`;
-                const cryptoResponse = await fetch(cryptoUrl);
-                const cryptoData = await cryptoResponse.json();
-                
-                // 3. Met à jour les taux MGA
-                for (const [coin, price] of Object.entries(cryptoData)) {
-                    const symbol = coinToSymbol(coin);
-                    if (symbol && price.usd) {
-                        CONFIG.ratesMGA[symbol] = price.usd * usdToMgaRate;
-                    }
-                }
-                
-                // 4. Met à jour l'affichage
-                refreshAll();
-                updateLastUpdatedTime();
-                toast("Taux mis à jour avec succès", 2000);
-                
-            } catch (e) {
-                console.error("Erreur API:", e);
-                toast("⚠️ Impossible de mettre à jour les taux. Utilisation des taux précédents.", 3000);
-            } finally {
-                // Cache l'indicateur de chargement
-                $("#rate-loading").style.display = "none";
-            }
-        }
-        
-        // Helper pour convertir les IDs CoinGecko en symboles
-        function coinToSymbol(coinId) {
-            const map = {
-                "bitcoin": "BTC",
-                "ethereum": "ETH",
-                "litecoin": "LTC",
-                "bitcoin-cash": "BCH",
-                "tether": "USDT"
-            };
-            return map[coinId] || null;
-        }
-        
         /* ===== UI Functions ===== */
         function refreshDepot() {
-            // ariary -> selected CRYPTO (currentCrypto) – depot fee
             const mga = +($("#dep-amount-ariary").value || 0);
             const unitMGA = CONFIG.ratesMGA[currentCrypto] || 0;
             const crypto = unitMGA ? mga / unitMGA * (1 - CONFIG.fees.depot) : 0;
+            
             $("#dep-amount-crypto").value = crypto ? crypto.toFixed(8) : "";
             $("#dep-crypto-suffix").textContent = currentCrypto;
-            $("#dep-rate-note").innerHTML = `1 ${currentCrypto} = ${unitMGA ? unitMGA.toLocaleString('fr-FR') : "—"} MGA`;
+            $("#dep-rate-note").innerHTML = `1 ${currentCrypto} = ${unitMGA.toLocaleString('fr-FR')} MGA`;
             $("#dep-fee-note").textContent = `Frais: ${(CONFIG.fees.depot * 100).toFixed(1)}%`;
-            // keep address label consistent with current choice
+            
             updateDepotDest();
         }
         
@@ -897,10 +822,6 @@
                 $("#dep-addr").value = addr;
                 $("#dep-addr-label").textContent = "Adresse de paiement";
                 $("#dep-addr-note").textContent = "Adresse crypto présaisie (non modifiable).";
-            } else {
-                $("#dep-pay-dest").textContent = "";
-                $("#dep-pay-name").textContent = "";
-                $("#dep-addr").value = "";
             }
         }
         
@@ -910,77 +831,67 @@
         }
         
         function renderStrips() {
-            // top crypto strip (main)
+            // Crypto strip
             const strip = $("#cryptoStrip");
             strip.innerHTML = "";
-            [...CONFIG.cryptosPrimary, ...(showMoreCryptos ? CONFIG.cryptosExtra : [])].forEach(sym => {
-                strip.appendChild(createChip(sym, sym === currentCrypto, () => {
+            [...CONFIG.cryptosPrimary].forEach(sym => {
+                const btn = document.createElement("button");
+                btn.className = "chip";
+                btn.textContent = sym;
+                btn.setAttribute("aria-pressed", sym === currentCrypto ? "true" : "false");
+                btn.addEventListener("click", () => {
                     currentCrypto = sym;
-                    if (payChoice in CONFIG.wallets || CONFIG.cryptoAddrs[payChoice]) { /* keep */ }
                     refreshAll();
-                }));
+                });
+                strip.appendChild(btn);
             });
             
-            // top ewallet strip
+            // E-wallet strip
             const ew = $("#ewalletStrip");
             ew.innerHTML = "";
-            [...CONFIG.ewalletsPrimary, ...(showMoreEwallets ? [] : [])].forEach(k => {
+            Object.keys(CONFIG.wallets).forEach(k => {
                 const lab = CONFIG.wallets[k].label;
-                ew.appendChild(createEwBtn(k, lab, k === payChoice, () => {
+                const btn = document.createElement("button");
+                btn.className = "ewbtn";
+                btn.textContent = lab;
+                btn.setAttribute("aria-pressed", k === payChoice ? "true" : "false");
+                btn.dataset.key = k;
+                btn.addEventListener("click", () => {
                     payChoice = k;
                     refreshAll();
-                }));
+                });
+                ew.appendChild(btn);
             });
-        }
-        
-        function createChip(label, active, onClick) {
-            const b = document.createElement("button");
-            b.className = "chip";
-            b.textContent = label;
-            b.setAttribute("aria-pressed", active ? "true" : "false");
-            b.addEventListener("click", onClick);
-            return b;
-        }
-        
-        function createEwBtn(key, label, active, onClick) {
-            const b = document.createElement("button");
-            b.className = "ewbtn";
-            b.textContent = label;
-            b.setAttribute("aria-pressed", active ? "true" : "false");
-            b.dataset.key = key;
-            b.addEventListener("click", onClick);
-            return b;
         }
         
         /* ===== Initialisation ===== */
         function initApp() {
-            // Initialisation des taux
-            fetchExchangeRates();
+            // Initialisation avec nos taux manuels
+            refreshAll();
+            $("#last-updated").textContent = "Taux configurés manuellement";
             
-            // Actualisation périodique (toutes les 5 minutes)
-            setInterval(fetchExchangeRates, 5 * 60 * 1000);
+            // Bouton vérifier (optionnel)
+            $("#refresh-rates").addEventListener("click", () => {
+                toast("Taux vérifiés (manuel)");
+            });
             
             // Écouteurs d'événements
-            $("#refresh-rates").addEventListener("click", fetchExchangeRates);
-            
             $("#toggleMoreCryptos").addEventListener("click", () => {
                 showMoreCryptos = !showMoreCryptos;
                 renderStrips();
-                toggleBtn($("#toggleMoreCryptos"), showMoreCryptos);
-            });
-            
-            $("#toggleMoreEwallets").addEventListener("click", () => {
-                showMoreEwallets = !showMoreEwallets;
-                renderStrips();
-                toggleBtn($("#toggleMoreEwallets"), showMoreEwallets);
+                $("#toggleMoreCryptos").innerHTML = showMoreCryptos
+                    ? `<svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> Réduire`
+                    : `<svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> Plus de cryptos`;
             });
             
             $("#dep-pay-opts").addEventListener("click", (e) => {
                 const btn = e.target.closest(".paybtn");
                 if (!btn) return;
                 payChoice = btn.dataset.pay;
-                $$("#dep-pay-opts .paybtn").forEach(b => b.setAttribute("aria-pressed", b.dataset.pay === payChoice ? "true" : "false"));
-                updateDepotDest();
+                $$("#dep-pay-opts .paybtn").forEach(b => 
+                    b.setAttribute("aria-pressed", b.dataset.pay === payChoice ? "true" : "false")
+                );
+                refreshAll();
             });
             
             $("#dep-amount-ariary").addEventListener("input", refreshDepot);
@@ -991,16 +902,10 @@
                 toast("Adresse copiée !");
             });
             
-            // Initialisation de l'interface
-            renderStrips();
-            updateDepotDest();
-            updateLastUpdatedTime();
-        }
-        
-        function toggleBtn(el, open) {
-            el.innerHTML = open
-                ? `<svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> Réduire`
-                : `<svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> Plus`;
+            // Acceptation CGU
+            $("#dep-accept").addEventListener("change", function() {
+                $("#dep-preview").disabled = !this.checked;
+            });
         }
         
         // Démarrer l'application
