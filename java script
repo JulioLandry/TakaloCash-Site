@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TakaloCash – Simple • Rapide • Sécurisé</title>
+    <style>
+        /* [Vos styles CSS existants] */
+        .refresh-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .refresh-btn {
+            background: var(--brand);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .refresh-btn:hover {
+            transform: rotate(180deg);
+            background: var(--brand-2);
+        }
+        
+        .refresh-btn:active {
+            transform: rotate(360deg);
+        }
+        
+        .last-updated {
+            font-size: 14px;
+            color: var(--muted);
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-left: 8px;
+        }
+        
+        .status-success {
+            background-color: var(--ok);
+        }
+        
+        .status-error {
+            background-color: var(--danger);
+        }
+    </style>
+</head>
+<body>
+    <!-- [Votre structure HTML existante] -->
+    
+    <div class="refresh-container">
+        <button class="refresh-btn" id="manual-refresh">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2">
+                <path d="M23 4v6h-6M1 20v-6h6"></path>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+        </button>
+        <div class="last-updated">
+            Dernière mise à jour: <span id="last-update-time">--:--:--</span>
+            <span id="status-indicator" class="status-indicator"></span>
+        </div>
+    </div>
+    
+    <!-- [Le reste de votre HTML] -->
+
+    <script>
+        /* ================== CONFIG ================== */
+        const CONFIG = {
+            // [Votre configuration existante]
+        };
+
+        /* ================== INIT ================== */
+        const $ = s => document.querySelector(s);
+        const $$ = s => document.querySelectorAll(s);
+        
+        let lastUpdateTime = null;
+        let isUpdating = false;
+
+        /* ===== Fonctions de mise à jour ===== */
+        async function updateRates() {
+            if (isUpdating) return;
+            
+            isUpdating = true;
+            const statusIndicator = $("#status-indicator");
+            
+            try {
+                // Afficher le statut de chargement
+                statusIndicator.className = "status-indicator";
+                statusIndicator.style.backgroundColor = "transparent";
+                statusIndicator.style.border = "2px solid var(--brand)";
+                statusIndicator.style.animation = "spin 1s linear infinite";
+                
+                // Simuler un délai pour voir l'animation (à supprimer en production)
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Récupérer les nouveaux taux
+                const newRates = await fetchNewRates();
+                
+                // Mettre à jour les taux dans CONFIG
+                Object.assign(CONFIG.ratesMGA, newRates);
+                
+                // Mettre à jour l'affichage
+                refreshUI();
+                
+                // Mettre à jour l'heure
+                lastUpdateTime = new Date();
+                $("#last-update-time").textContent = formatTime(lastUpdateTime);
+                
+                // Afficher le succès
+                statusIndicator.className = "status-indicator status-success";
+                statusIndicator.style.animation = "none";
+                
+                toast("Taux mis à jour avec succès");
+                
+            } catch (error) {
+                console.error("Erreur de mise à jour:", error);
+                statusIndicator.className = "status-indicator status-error";
+                statusIndicator.style.animation = "none";
+                
+                toast("Erreur lors de la mise à jour des taux", 3000);
+            } finally {
+                isUpdating = false;
+            }
+        }
+
+        async function fetchNewRates() {
+            // Implémentez votre logique de récupération des taux ici
+            // Retourne un objet avec les nouveaux taux (ex: {BTC: 150000000, ETH: 9000000})
+            
+            // Exemple avec des données simulées
+            return {
+                BTC: 150000000 + Math.floor(Math.random() * 1000000),
+                ETH: 9000000 + Math.floor(Math.random() * 100000),
+                USDT: 4500 + Math.floor(Math.random() * 100)
+            };
+        }
+
+        function refreshUI() {
+            // Implémentez votre logique de rafraîchissement de l'interface ici
+            console.log("UI rafraîchie avec les nouveaux taux:", CONFIG.ratesMGA);
+        }
+
+        function formatTime(date) {
+            return date.toLocaleTimeString('fr-FR');
+        }
+
+        function toast(message, duration = 2000) {
+            const toast = $("#toast");
+            toast.textContent = message;
+            toast.classList.add("show");
+            
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, duration);
+        }
+
+        /* ===== Initialisation ===== */
+        document.addEventListener('DOMContentLoaded', () => {
+            // Bouton de rafraîchissement manuel
+            $("#manual-refresh").addEventListener('click', updateRates);
+            
+            // Première mise à jour au chargement
+            updateRates();
+        });
+
+        /* Animation de rotation */
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </script>
+</body>
+</html>
