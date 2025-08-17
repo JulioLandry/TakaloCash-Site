@@ -66,6 +66,58 @@
   .btn-ghost{background:#000;color:#fff}
   .copybtn{border:none;border-radius:10px;padding:10px 12px;background:#111;color:#fff;cursor:pointer;font-weight:800}
 
+  /* Crypto selector */
+  .crypto-selector {
+    position: relative;
+    display: inline-block;
+  }
+  .crypto-selector-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+  }
+  .crypto-selector-btn .arrow {
+    transition: transform 0.2s;
+  }
+  .crypto-selector-btn.open .arrow {
+    transform: rotate(180deg);
+  }
+  .crypto-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    z-index: 100;
+    max-height: 300px;
+    overflow-y: auto;
+    display: none;
+    width: 200px;
+  }
+  .crypto-dropdown.open {
+    display: block;
+  }
+  .crypto-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .crypto-item:hover {
+    background: #f5f5f5;
+  }
+  .crypto-item.active {
+    background: #ffbf0022;
+  }
+  .crypto-rate {
+    font-size: 12px;
+    color: #666;
+  }
+
   /* Toast & confirm */
   .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#111;color:#fff;padding:12px 16px;border-radius:10px;box-shadow:0 8px 20px rgba(0,0,0,.25);display:none;z-index:50}
   .toast.show{display:block}
@@ -124,9 +176,17 @@
 <main>
   <!-- Crypto rates display -->
   <div class="panel" id="rates-panel">
-    <div class="row" style="justify-content: space-between; flex-wrap: wrap;">
+    <div class="row" style="justify-content: space-between; flex-wrap: wrap; align-items: center;">
       <div><b>Cours actuels:</b></div>
-      <div id="crypto-rates" style="display: flex; gap: 16px; flex-wrap: wrap;"></div>
+      <div class="crypto-selector" id="crypto-selector">
+        <div class="crypto-selector-btn" id="crypto-selector-btn">
+          <span id="current-rate-display">Chargement...</span>
+          <svg class="arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </div>
+        <div class="crypto-dropdown" id="crypto-dropdown"></div>
+      </div>
     </div>
   </div>
 
@@ -478,9 +538,98 @@ function renderStrips(){
   }
 }
 
-/* ===== Crypto Rates Display ===== */
-const cryptoMapping = {BTC:"btc-bitcoin",ETH:"eth-ethereum",USDT:"usdt-tether",LTC:"ltc-litecoin",BCH:"bch-bitcoin-cash"};
-const fallbackRates = {BTC:150000,ETH:9000,USDT:1,LTC:350,BCH:2800};
+/* ===== Crypto Selector ===== */
+function setupCryptoSelector() {
+  const selectorBtn = $("#crypto-selector-btn");
+  const dropdown = $("#crypto-dropdown");
+  
+  selectorBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    selectorBtn.classList.toggle("open");
+    dropdown.classList.toggle("open");
+  });
+  
+  // Close dropdown when clicking outside
+  document.addEventListener("click", (e) => {
+    if (!selectorBtn.contains(e.target) && !dropdown.contains(e.target)) {
+      selectorBtn.classList.remove("open");
+      dropdown.classList.remove("open");
+    }
+  });
+  
+  // Update dropdown content
+  updateCryptoDropdown();
+}
+
+function updateCryptoDropdown() {
+  const dropdown = $("#crypto-dropdown");
+  dropdown.innerHTML = "";
+  
+  // Add all cryptos to dropdown
+  [...CONFIG.cryptosPrimary, ...CONFIG.cryptosExtra].forEach(sym => {
+    const item = document.createElement("div");
+    item.className = "crypto-item";
+    if (sym === currentCrypto) item.classList.add("active");
+    
+    item.innerHTML = `
+      <span>${sym}</span>
+      <span class="crypto-rate">${CONFIG.ratesMGA[sym]?.toLocaleString() || '...'} MGA</span>
+    `;
+    
+    item.addEventListener("click", () => {
+      currentCrypto = sym;
+      $("#crypto-selector-btn").classList.remove("open");
+      dropdown.classList.remove("open");
+      refreshAll();
+    });
+    
+    dropdown.appendChild(item);
+  });
+}
+
+function updateCurrentRateDisplay() {
+  const display = $("#current-rate-display");
+  if (currentCrypto && CONFIG.ratesMGA[currentCrypto]) {
+    display.textContent = `1 ${currentCrypto} = ${CONFIG.ratesMGA[currentCrypto].toLocaleString()} MGA`;
+  } else {
+    display.textContent = "Chargement...";
+  }
+}
+
+/* ===== Crypto Rates ===== */
+const cryptoMapping = {
+  BTC:"btc-bitcoin",
+  ETH:"eth-ethereum",
+  USDT:"usdt-tether",
+  LTC:"ltc-litecoin",
+  BCH:"bch-bitcoin-cash",
+  USDC:"usdc-usd-coin",
+  BUSD:"busd-binance-usd",
+  DAI:"dai-dai",
+  ADA:"ada-cardano",
+  SOL:"sol-solana",
+  DOT:"dot-polkadot",
+  LINK:"link-chainlink",
+  UNI:"uni-uniswap",
+  CAKE:"cake-pancakeswap"
+};
+
+const fallbackRates = {
+  BTC:150000,
+  ETH:9000,
+  USDT:1,
+  LTC:350,
+  BCH:2800,
+  USDC:1,
+  BUSD:1,
+  DAI:1,
+  ADA:1.2,
+  SOL:70,
+  DOT:12,
+  LINK:8,
+  UNI:6,
+  CAKE:3
+};
 
 let ratesUSD = {};
 
@@ -498,33 +647,22 @@ async function fetchRate(sym){
 }
 
 async function updateRates(){
-  for(const sym of CONFIG.cryptosPrimary){
+  const allCryptos = [...CONFIG.cryptosPrimary, ...CONFIG.cryptosExtra];
+  
+  for(const sym of allCryptos){
     const rate = await fetchRate(sym);
     ratesUSD[sym] = rate;
     
-    // Update rates display
-    const rateMGA = rate * CONFIG.ratesMGA[sym] / fallbackRates[sym];
-    const rateEl = document.createElement("span");
-    rateEl.innerHTML = `${sym}: <b>${Math.round(rateMGA).toLocaleString()}</b> MGA`;
-    document.getElementById("crypto-rates").appendChild(rateEl);
-    
-    // Update config with live rates
-    CONFIG.ratesMGA[sym] = Math.round(rateMGA);
+    // Update config with live rates (scaled from USD to MGA based on fallback ratio)
+    if (fallbackRates[sym] && rate) {
+      CONFIG.ratesMGA[sym] = Math.round(rate * (CONFIG.ratesMGA[sym] / fallbackRates[sym]));
+    }
   }
   
-  // Refresh all calculations with new rates
+  // Update UI
+  updateCurrentRateDisplay();
+  updateCryptoDropdown();
   refreshAll();
-}
-
-function renderRates(){
-  const container = $("#crypto-rates");
-  container.innerHTML = "";
-  
-  CONFIG.cryptosPrimary.forEach(sym => {
-    const rateEl = document.createElement("span");
-    rateEl.innerHTML = `${sym}: <b>${CONFIG.ratesMGA[sym].toLocaleString()}</b> MGA`;
-    container.appendChild(rateEl);
-  });
 }
 
 /* ===== Expanders (+) ===== */
@@ -691,8 +829,13 @@ function refreshTransfer(){
   $$("#cryptoStripTransfer .chip").forEach(b=>b.setAttribute("aria-pressed", b.textContent===transferTarget?"true":"false"));
   $$("#ewalletStripTransfer .ewbtn").forEach(b=>b.setAttribute("aria-pressed", b.dataset.key===transferTarget?"true":"false"));
 }
-function refreshAll(){ renderStrips(); renderRates(); refreshDepot(); refreshRetrait(); refreshTransfer(); }
-refreshAll();
+function refreshAll(){ 
+  updateCurrentRateDisplay();
+  renderStrips(); 
+  refreshDepot(); 
+  refreshRetrait(); 
+  refreshTransfer(); 
+}
 
 /* ===== Validation helpers (all fields + checkbox before Aperçu) ===== */
 function requiredFilledDepot(){
@@ -790,9 +933,11 @@ async function sendEmail(data){
 /* ===== Initial dep address + texts ===== */
 updateDepotDest();
 
-// Initialize rates
+// Initialize the app
+setupCryptoSelector();
 updateRates();
 setInterval(updateRates, 60000); // Update rates every minute
+refreshAll();
 </script>
 </body>
-</html> 
+</html>
