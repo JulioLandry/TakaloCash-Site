@@ -412,8 +412,87 @@ const CONFIG = {
     USDT:4_500, USDC:4_500, BUSD:4_500, DAI:4_500,
     ADA:1_200, SOL:700_000, DOT:120_000, LINK:80_000, UNI:60_000, CAKE:30_000
   },
-  fees: { depot:0.003, retrait:0.005, transfert:0.004 }
+  fees: { depot:0.003, retrait:0.005, transfert:0.004 },
+  
+  // Nouvelle configuration pour les taux et frais
+  coingeckoAPI: "https://api.coingecko.com/api/v3/simple/price",
+  cryptoMapping: {
+    BTC: "bitcoin",
+    ETH: "ethereum",
+    USDT: "tether"
+  },
+  fallbackRates: {
+    BTC: 40000,
+    ETH: 2500,
+    USDT: 4440
+  },
+  cryptoFee: {
+    depot: {
+      BTC: 0.0005,
+      ETH: 0.0015,
+      USDT: 1
+    },
+    retrait: {
+      BTC: 0.0003,
+      ETH: 0.001,
+      USDT: 0.5
+    }
+  },
+  rateAdjustment: {
+    depot: 0.96,
+    retrait: 0.98
+  }
 };
+
+/* ================== TRANSACTION SERVICE ================== */
+class TransactionService {
+  static async getAdjustedRate(service, cryptoSymbol) {
+    try {
+      const cryptoId = CONFIG.cryptoMapping[cryptoSymbol];
+      if (!cryptoId) return CONFIG.fallbackRates[cryptoSymbol] || 0;
+      
+      const response = await fetch(
+        `${CONFIG.coingeckoAPI}?ids=${cryptoId}&vs_currencies=usd`
+      );
+      const data = await response.json();
+      const marketRate = data?.[cryptoId]?.usd || CONFIG.fallbackRates[cryptoSymbol];
+      return marketRate * CONFIG.rateAdjustment[service];
+    } catch (error) {
+      console.error("Erreur taux:", error);
+      return CONFIG.fallbackRates[cryptoSymbol] || 0;
+    }
+  }
+
+  static async calculateDepot(amountAR, cryptoSymbol) {
+    const rate = await this.getAdjustedRate('depot', cryptoSymbol);
+    const networkFee = CONFIG.cryptoFee.depot[cryptoSymbol] || 0;
+    const cryptoAmount = (amountAR / rate * (1 - CONFIG.fees.depot)) - networkFee;
+    
+    return {
+      amount: Math.max(0, cryptoAmount).toFixed(8),
+      rate: rate.toLocaleString(),
+      fees: {
+        service: CONFIG.fees.depot * 100,
+        network: networkFee
+      }
+    };
+  }
+
+  static async calculateRetrait(amountCrypto, cryptoSymbol) {
+    const rate = await this.getAdjustedRate('retrait', cryptoSymbol);
+    const networkFee = CONFIG.cryptoFee.retrait[cryptoSymbol] || 0;
+    const amountAR = ((amountCrypto - networkFee) * rate) * (1 - CONFIG.fees.retrait);
+    
+    return {
+      amount: Math.max(0, amountAR).toLocaleString(),
+      rate: rate.toLocaleString(),
+      fees: {
+        service: CONFIG.fees.retrait * 100,
+        network: networkFee
+      }
+    };
+  }
+}
 
 /* ================== INIT ================== */
 (function(){
@@ -590,40 +669,64 @@ function updateDepotDest(){
 }
 
 /* ===== Refreshers ===== */
-function refreshDepot(){
-  // ariary -> selected CRYPTO (currentCrypto) – depot fee
+async function refreshDepot(){
   const mga = +($("#dep-amount-ariary").value || 0);
-  const unitMGA = CONFIG.ratesMGA[currentCrypto] || 0;
-  const crypto = unitMGA ? applyFee(mga/unitMGA, CONFIG.fees.depot) : 0;
-  $("#dep-amount-crypto").value = crypto ? crypto.toFixed(8) : "";
-  $("#dep-crypto-suffix").textContent = currentCrypto;
-  $("#dep-rate-note").textContent = rateLine(currentCrypto);
-  $("#dep-fee-note").textContent = "Frais: " + (CONFIG.fees.depot*100).toFixed(1) + "%";
-  // keep address label consistent with current choice
+  
+  if (mga > 0) {
+    try {
+      const result = await TransactionService.calculateDepot(mga, currentCrypto);
+      $("#dep-amount-crypto").value = result.amount;
+      $("#dep-crypto-suffix").textContent = currentCrypto;
+      $("#dep-rate-note").textContent = `1 ${currentCrypto} = ${result.rate} USD (Taux ajusté)`;
+      $("#dep-fee-note").textContent = 
+        `Frais: ${result.fees.service}% service + ${result.fees.network} ${currentCrypto} réseau`;
+    } catch (e) {
+      console.error("Erreur calcul dépôt:", e);
+      $("#dep-amount-crypto").value = "";
+      $("#dep-rate-note").textContent = "Erreur de calcul";
+    }
+  } else {
+    $("#dep-amount-crypto").value = "";
+  }
+  
   updateDepotDest();
 }
-function refreshRetrait(){
+
+async function refreshRetrait(){
   const qty = +($("#ret-amount-crypto").value || 0);
-  const unitMGA = CONFIG.ratesMGA[currentCrypto] || 0;
-  const mga = applyFee(qty*unitMGA, CONFIG.fees.retrait);
-  $("#ret-amount-ariary").value = mga ? Math.round(mga).toLocaleString() : "";
-  $("#ret-rate-note").textContent = rateLine(currentCrypto);
-  $("#ret-fee-note").textContent = "Frais: " + (CONFIG.fees.retrait*100).toFixed(1) + "%";
+  
+  if (qty > 0) {
+    try {
+      const result = await TransactionService.calculateRetrait(qty, currentCrypto);
+      $("#ret-amount-ariary").value = result.amount;
+      $("#ret-rate-note").textContent = `1 ${currentCrypto} = ${result.rate} USD (Taux ajusté)`;
+      $("#ret-fee-note").textContent = 
+        `Frais: ${result.fees.service}% service + ${result.fees.network} ${currentCrypto} réseau`;
+    } catch (e) {
+      console.error("Erreur calcul retrait:", e);
+      $("#ret-amount-ariary").value = "";
+      $("#ret-rate-note").textContent = "Erreur de calcul";
+    }
+  } else {
+    $("#ret-amount-ariary").value = "";
+  }
+  
   $("#ret-crypto-suffix").textContent = currentCrypto;
   $("#ret-our-addr").value = CONFIG.cryptoAddrs[currentCrypto] || "";
   $("#ret-crypto-only").innerHTML = "Envoyer seulement en <b>"+currentCrypto+"</b>";
 }
+
 function refreshTransfer(){
   const qty = +($("#trf-amount-top").value || 0);
   const isTargetCrypto = /^[A-Z]{3,5}$/.test(transferTarget);
   let rate = "—", out = 0;
   if(isTargetCrypto){
     rate = crossRate(currentCrypto, transferTarget);
-    out = applyFee(qty * (Number(rate)||0), CONFIG.fees.transfert);
+    out = applyFee(qty * (Number(rate)||0, CONFIG.fees.transfert);
   }else{
     // target ewallet: treat as stable token USDT as proxy convert
     rate = crossRate(currentCrypto, "USDT");
-    out = applyFee(qty * (Number(rate)||0), CONFIG.fees.transfert);
+    out = applyFee(qty * (Number(rate)||0, CONFIG.fees.transfert);
   }
   $("#trf-amount-bot").value = out ? out.toFixed(8) : "";
   $("#trf-top-suffix").textContent = currentCrypto;
