@@ -118,76 +118,6 @@
     color: #666;
   }
 
-  /* Nouveaux styles ajoutés */
-  .payment-source, .payment-destination {
-    background: #f9f9f9;
-    border-radius: 12px;
-    padding: 12px;
-    margin-bottom: 16px;
-    border: 1px solid #eee;
-  }
-  
-  .payment-source h3, .payment-destination h3 {
-    margin-top: 0;
-    color: #444;
-    font-size: 16px;
-  }
-  
-  .payment-options {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-top: 8px;
-  }
-  
-  .payment-option {
-    padding: 8px 12px;
-    background: #111;
-    color: white;
-    border-radius: 20px;
-    font-size: 14px;
-    cursor: pointer;
-  }
-  
-  .payment-option.active {
-    background: var(--brand);
-    color: #111;
-  }
-  
-  .section-title {
-    font-size: 24px;
-    margin-bottom: 20px;
-    color: var(--brand);
-  }
-  
-  .crypto-strip-container, .ewallet-strip-container {
-    margin-bottom: 16px;
-  }
-  
-  .crypto-strip-container h3, .ewallet-strip-container h3 {
-    margin-bottom: 8px;
-    font-size: 16px;
-    color: #444;
-  }
-  
-  .expand-crypto-btn {
-    background: var(--brand);
-    color: #111;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  
-  .expand-crypto-btn:hover {
-    background: var(--brand-2);
-  }
-
   /* Toast & confirm */
   .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#111;color:#fff;padding:12px 16px;border-radius:10px;box-shadow:0 8px 20px rgba(0,0,0,.25);display:none;z-index:50}
   .toast.show{display:block}
@@ -260,46 +190,39 @@
     </div>
   </div>
 
+  <!-- STRIPS (top of every tab) -->
+  <div class="crypto-strip" id="cryptoStrip"></div>
+  <div class="ewallet-strip" id="ewalletStrip"></div>
+
   <!-- ================== DEPOT ================== -->
   <section id="panel-depot" class="panel" role="tabpanel" aria-labelledby="tab-depot">
-    <h2 class="section-title">Dépôt</h2>
-    
-    <!-- Source : Mobile Money -->
-    <div class="payment-source">
-      <h3>Source : Mobile Money</h3>
-      <div class="payment-options" id="dep-pay-opts">
-        <button class="payment-option active" data-pay="mvola">Mvola</button>
-        <button class="payment-option" data-pay="orange">Orange Money</button>
-        <button class="payment-option" data-pay="airtel">Airtel Money</button>
-      </div>
-    </div>
-
-    <!-- Destination Crypto -->
-    <div class="crypto-strip-container">
-      <h3>Choisir Crypto</h3>
-      <div class="crypto-strip" id="cryptoStrip"></div>
-      <button class="expand-crypto-btn" id="expandCryptoDepot">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 5v14M5 12h14"/>
-        </svg>
+    <!-- Expanders -->
+    <div class="row">
+      <button class="expand-btn" id="toggleMoreCryptos">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         Plus de cryptos
       </button>
-    </div>
-
-    <!-- Destination E-wallet -->
-    <div class="ewallet-strip-container">
-      <h3>Choisir E-wallet</h3>
-      <div class="ewallet-strip" id="ewalletStrip"></div>
+      <button class="expand-btn" id="toggleMoreEwallets">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Plus d'e-wallets
+      </button>
     </div>
 
     <div class="grid" style="margin-top:10px">
       <!-- ENVOIE (Montant + Paiement) -->
       <div>
-        <div class="label">Montant à envoyer</div>
+        <div class="label">Envoie</div>
         <div class="field">
           <input id="dep-amount-ariary" type="number" inputmode="decimal" placeholder="montant en ariary" />
           <span class="prefix">MGA</span>
           <span class="suffix" id="dep-pay-logo">Mvola</span>
+        </div>
+
+        <div class="note">Choisir le moyen de paiement:</div>
+        <div class="pay-opts" id="dep-pay-opts">
+          <button class="paybtn" data-pay="mvola" aria-pressed="true">Mvola</button>
+          <button class="paybtn" data-pay="orange">Orange Money</button>
+          <button class="paybtn" data-pay="airtel">Airtel Money</button>
         </div>
 
         <div class="note muted" id="dep-pay-hint">
@@ -309,7 +232,7 @@
 
       <!-- REÇU (Crypto amount + Adresse preset selon sélection) -->
       <div>
-        <div class="label">Montant à recevoir</div>
+        <div class="label">Reçu</div>
         <div class="field">
           <input id="dep-amount-crypto" type="text" placeholder="0.00000000" readonly />
           <span class="suffix" id="dep-crypto-suffix">BTC</span>
@@ -326,6 +249,7 @@
           </div>
           <button class="copybtn" id="dep-copy">Copier</button>
         </div>
+        <div class="note muted" id="dep-addr-note">Adresse/identifiant présaisie selon le moyen sélectionné (non modifiable).</div>
       </div>
     </div>
 
@@ -344,39 +268,20 @@
 
   <!-- ================== RETRAIT ================== -->
   <section id="panel-retrait" class="panel" role="tabpanel" aria-labelledby="tab-retrait" hidden>
-    <h2 class="section-title">Retrait</h2>
-    
-    <!-- Source Crypto -->
-    <div class="crypto-strip-container">
-      <h3>Choisir Crypto</h3>
-      <div class="crypto-strip" id="cryptoStripRetrait"></div>
-      <button class="expand-crypto-btn" id="expandCryptoRetrait">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 5v14M5 12h14"/>
-        </svg>
+    <div class="row">
+      <button class="expand-btn" id="toggleMoreCryptos2">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         Plus de cryptos
       </button>
-    </div>
-
-    <!-- Source E-wallet -->
-    <div class="ewallet-strip-container">
-      <h3>Choisir E-wallet</h3>
-      <div class="ewallet-strip" id="ewalletStripRetrait"></div>
-    </div>
-
-    <!-- Destination : Mobile Money -->
-    <div class="payment-destination">
-      <h3>Destination : Mobile Money</h3>
-      <div class="payment-options" id="ret-pay-opts">
-        <button class="payment-option active" data-pay="mvola">Mvola</button>
-        <button class="payment-option" data-pay="orange">Orange Money</button>
-        <button class="payment-option" data-pay="airtel">Airtel Money</button>
-      </div>
+      <button class="expand-btn" id="toggleMoreEwallets2">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Plus d'e-wallets
+      </button>
     </div>
 
     <div class="grid" style="margin-top:10px">
       <div>
-        <div class="label">Montant à envoyer</div>
+        <div class="label">Envoie</div>
         <div class="field">
           <input id="ret-amount-crypto" type="number" inputmode="decimal" placeholder="0.00000000" />
           <span class="suffix" id="ret-crypto-suffix">BTC</span>
@@ -394,7 +299,7 @@
       </div>
 
       <div>
-        <div class="label">Montant à recevoir</div>
+        <div class="label">Reçu</div>
         <div class="field">
           <input id="ret-amount-ariary" type="text" placeholder="0 MGA" readonly />
           <span class="prefix">MGA</span>
@@ -405,7 +310,7 @@
           <div id="ret-fee-note">Frais: 0,5%</div>
         </div>
 
-        <div class="label">Numéro de téléphone</div>
+        <div class="label">Moyen de réception</div>
         <div class="field">
           <input id="ret-phone" type="tel" placeholder="Numéro (mobile money / e-wallet)" />
           <span class="suffix" id="ret-wallet-icon">Mvola</span>
@@ -429,36 +334,20 @@
 
   <!-- ================== TRANSFERT ================== -->
   <section id="panel-transfert" class="panel" role="tabpanel" aria-labelledby="tab-transfert" hidden>
-    <h2 class="section-title">Transfert</h2>
-    
-    <!-- Source Crypto -->
-    <div class="crypto-strip-container">
-      <h3>Source : Choisir Crypto</h3>
-      <div class="crypto-strip" id="cryptoStripTransfert"></div>
-      <button class="expand-crypto-btn" id="expandCryptoTransfert">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 5v14M5 12h14"/>
-        </svg>
+    <div class="row">
+      <button class="expand-btn" id="toggleMoreCryptos3">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         Plus de cryptos
       </button>
-    </div>
-
-    <!-- Source E-wallet -->
-    <div class="ewallet-strip-container">
-      <h3>Source : Choisir E-wallet</h3>
-      <div class="ewallet-strip" id="ewalletStripTransfert"></div>
-    </div>
-
-    <!-- Destination -->
-    <div class="destination">
-      <h3>Destination</h3>
-      <div class="crypto-strip" id="cryptoStripTransfer"></div>
-      <div class="ewallet-strip" id="ewalletStripTransfer"></div>
+      <button class="expand-btn" id="toggleMoreEwallets3">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Plus d'e-wallets
+      </button>
     </div>
 
     <div class="grid" style="margin-top:10px">
       <div>
-        <div class="label">Montant à envoyer</div>
+        <div class="label">Envoie</div>
         <div class="field">
           <input id="trf-amount-top" type="number" inputmode="decimal" placeholder="0.00000000" />
           <span class="suffix" id="trf-top-suffix">BTC</span>
@@ -467,7 +356,7 @@
       </div>
 
       <div>
-        <div class="label">Montant à recevoir</div>
+        <div class="label">Reçu</div>
         <div class="field">
           <input id="trf-amount-bot" type="text" placeholder="0.00000000" readonly />
           <span class="suffix" id="trf-bot-suffix">USDT</span>
@@ -475,6 +364,10 @@
         <div class="note muted" id="trf-rate-note">1 BTC = 35 USDT</div>
       </div>
     </div>
+
+    <div class="label" style="margin-top:8px">Choisir la crypto/e-wallet à recevoir</div>
+    <div class="crypto-strip" id="cryptoStripTransfer"></div>
+    <div class="ewallet-strip" id="ewalletStripTransfer"></div>
 
     <div class="label" style="margin-top:8px">Adresse de réception</div>
     <div class="field">
